@@ -1,0 +1,19 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "Phoenix Save",
+    "type": "object",
+    "required": [
+        "schemaVersion",
+        "campaign"
+    ],
+    "properties": {
+        "schemaVersion": {
+            "type": "integer",
+            "minimum": 1
+        },
+        "campaign": {
+            "type": "object"
+        }
+    },
+    "additionalProperties": true
+}

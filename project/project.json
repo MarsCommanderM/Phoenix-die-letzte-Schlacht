@@ -1,0 +1,22 @@
+{
+    "project_name": "Phoenix",
+    "project_id": "{D2F2F8A7-9C4B-4D1B-8E6A-6A2D7F9B1C01}",
+    "origin": "Phoenix",
+    "canonical_tags": [
+        "Project"
+    ],
+    "compatible_engines": [
+        "o3de==26.05.0"
+    ],
+    "engine_api_dependencies": [],
+    "external_subdirectories": [
+        "gems/PhoenixCore",
+        "gems/PhoenixGameplay",
+        "gems/PhoenixCharacter",
+        "gems/PhoenixAI",
+        "gems/PhoenixWorld",
+        "gems/PhoenixPresentation",
+        "gems/PhoenixNetworking",
+        "gems/PhoenixTools"
+    ]
+}

@@ -1,0 +1,21 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "Phoenix Encounter",
+    "type": "object",
+    "required": [
+        "id",
+        "participants"
+    ],
+    "properties": {
+        "id": {
+            "type": "string"
+        },
+        "participants": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        }
+    },
+    "additionalProperties": false
+}

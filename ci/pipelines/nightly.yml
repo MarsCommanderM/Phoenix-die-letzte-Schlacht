@@ -1,0 +1,13 @@
+name: Phoenix Nightly
+
+on:
+  schedule:
+    - cron: "0 2 * * *"
+
+jobs:
+  validation:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: python scripts/validate.py
+      - run: python scripts/test.py

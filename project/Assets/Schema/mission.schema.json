@@ -1,0 +1,21 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "Phoenix Mission",
+    "type": "object",
+    "required": [
+        "id",
+        "objectives"
+    ],
+    "properties": {
+        "id": {
+            "type": "string"
+        },
+        "objectives": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        }
+    },
+    "additionalProperties": false
+}

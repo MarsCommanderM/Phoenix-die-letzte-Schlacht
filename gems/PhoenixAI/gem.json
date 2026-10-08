@@ -1,0 +1,28 @@
+{
+    "gem_name": "PhoenixAI",
+    "display_name": "PhoenixAI",
+    "version": "0.1.0",
+    "license": "Apache-2.0",
+    "license_url": "https://www.apache.org/licenses/LICENSE-2.0",
+    "origin": "Phoenix",
+    "origin_url": "https://example.invalid/phoenix",
+    "type": "Code",
+    "summary": "Phoenix PhoenixAI gameplay/engine integration Gem.",
+    "canonical_tags": [
+        "Gem"
+    ],
+    "user_tags": [
+        "Phoenix",
+        "Game"
+    ],
+    "compatible_engines": [
+        "o3de==26.05.0"
+    ],
+    "engine_api_dependencies": [],
+    "dependencies": [
+        "PhoenixCore",
+        "PhoenixGameplay",
+        "PhoenixCharacter",
+        "Navigation"
+    ]
+}

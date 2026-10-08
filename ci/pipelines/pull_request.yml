@@ -1,0 +1,14 @@
+name: Phoenix Pull Request
+
+on:
+  pull_request:
+
+jobs:
+  static:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate Python metadata and schemas
+        run: python scripts/validate.py
+      - name: Run repository tests
+        run: python scripts/test.py

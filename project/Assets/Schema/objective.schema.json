@@ -1,0 +1,25 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "Phoenix Objective",
+    "type": "object",
+    "required": [
+        "id",
+        "state"
+    ],
+    "properties": {
+        "id": {
+            "type": "string"
+        },
+        "state": {
+            "enum": [
+                "Hidden",
+                "Available",
+                "Active",
+                "Completed",
+                "Failed",
+                "Skipped"
+            ]
+        }
+    },
+    "additionalProperties": false
+}

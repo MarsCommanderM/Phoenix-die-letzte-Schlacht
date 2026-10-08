@@ -1,0 +1,7 @@
+{
+    "movement": {
+        "walkSpeed": 3.5,
+        "sprintSpeed": 5.5,
+        "crouchSpeed": 2.0
+    }
+}

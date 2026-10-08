@@ -1,0 +1,8 @@
+{
+    "client": {
+        "targetFrameTimeMs": 16.67
+    },
+    "server": {
+        "targetTickTimeMs": 16.67
+    }
+}

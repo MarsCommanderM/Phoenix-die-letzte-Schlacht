@@ -1,0 +1,24 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "Phoenix Action",
+    "type": "object",
+    "required": [
+        "id",
+        "durationSeconds",
+        "cooldownSeconds"
+    ],
+    "properties": {
+        "id": {
+            "type": "string"
+        },
+        "durationSeconds": {
+            "type": "number",
+            "minimum": 0
+        },
+        "cooldownSeconds": {
+            "type": "number",
+            "minimum": 0
+        }
+    },
+    "additionalProperties": false
+}

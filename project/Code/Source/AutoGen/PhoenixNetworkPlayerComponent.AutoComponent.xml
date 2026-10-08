@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<Component
+    Name="PhoenixNetworkPlayerComponent"
+    Namespace="Phoenix"
+    OverrideComponent="false"
+    OverrideController="false"
+    OverrideInclude=""
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <NetworkInput Type="float" Name="MoveForward" Init="0.0f" />
+    <NetworkInput Type="float" Name="MoveRight" Init="0.0f" />
+    <NetworkInput Type="bool" Name="Jump" Init="false" />
+    <NetworkInput Type="bool" Name="Crouch" Init="false" />
+</Component>
