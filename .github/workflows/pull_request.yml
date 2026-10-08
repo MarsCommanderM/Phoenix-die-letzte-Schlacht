@@ -21,10 +21,14 @@ jobs:
         run: python -m pip install --disable-pip-version-check -r requirements-dev.txt
       - name: Validate schemas, data and gem graph
         run: python scripts/validate.py
+      - name: Validate architecture rules
+        run: python scripts/check_architecture.py
       - name: Validate project and gem manifests
         run: python tools/validation/validate_project.py
       - name: Validate asset authoring rules
         run: python tools/validation/validate_assets.py
+      - name: Validate version contracts
+        run: python tools/validation/validate_versions.py
       - name: Report budget coverage
         run: python tools/profiling/analyze_budget.py
       - name: Run repository tests
