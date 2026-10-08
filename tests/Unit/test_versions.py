@@ -1,5 +1,6 @@
 import contextlib
 import json
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -51,11 +52,19 @@ def candidate_config(overrides: dict):
 
     An override value of None omits that file; a string is written verbatim so
     a malformed-JSON case can be expressed.
+
+    The committed Schema/ directory is copied in, because the validator now
+    shape-checks each contract against its schema. Leaving it out would make
+    every case fail for the wrong reason, and a candidate config with no
+    schemas is genuinely incomplete rather than merely untested.
     """
     documents = good_documents()
     documents.update(overrides)
     with tempfile.TemporaryDirectory() as tmp:
         directory = Path(tmp)
+        shutil.copytree(
+            validate_versions.CONFIG_DIR / "Schema", directory / "Schema"
+        )
         for name, document in documents.items():
             if document is None:
                 continue
@@ -282,3 +291,140 @@ class SaveSchemaAgreementTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+GOOD_HEADER = """#pragma once
+
+#include <AzCore/std/string/string_view.h>
+
+namespace Phoenix::Version
+{
+    inline constexpr unsigned Major = 0;
+    inline constexpr unsigned Minor = 1;
+    inline constexpr unsigned Patch = 0;
+    inline constexpr AZStd::string_view Product = "Phoenix";
+}
+"""
+
+
+class VersionHeaderCrossCheckTests(unittest.TestCase):
+    """project/Config/version.json against Phoenix::Version in the header.
+
+    Two places stating the product version is a drift waiting to happen, and
+    the symptom is a support call nobody can resolve: the launcher reports one
+    version, the binary reports another, and both are "the version".
+    """
+
+    def errors_for(self, header: str | None, version: dict | None = None) -> list[str]:
+        """Run the cross-check against a synthetic header.
+
+        VERSION_HEADER is redirected rather than the committed header edited:
+        a check that can only be exercised by breaking the tree is a check
+        nobody runs.
+        """
+        document = version if version is not None else good_documents()["version.json"]
+        original = validate_versions.VERSION_HEADER
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "PhoenixVersion.h"
+            if header is not None:
+                path.write_text(header, encoding="utf-8")
+            validate_versions.VERSION_HEADER = path
+            try:
+                errors: list[str] = []
+                validate_versions.check_version_header(document, errors)
+            finally:
+                validate_versions.VERSION_HEADER = original
+        return errors
+
+    def test_the_committed_header_agrees_with_the_committed_config(self):
+        errors: list[str] = []
+        validate_versions.check_version_header(
+            load_json(validate_versions.CONFIG_DIR / "version.json"), errors
+        )
+        self.assertEqual(errors, [], f"header and config disagree: {errors}")
+
+    def test_a_matching_header_is_accepted(self):
+        self.assertEqual(self.errors_for(GOOD_HEADER), [])
+
+    def test_a_drifted_number_is_rejected(self):
+        errors = self.errors_for(GOOD_HEADER.replace("Minor = 1", "Minor = 7"))
+        self.assertTrue(any("bump them together" in e for e in errors), errors)
+
+    def test_a_commented_out_constant_is_rejected(self):
+        """The hazard the module docstring names, tested rather than asserted.
+
+        A regex over raw source would find `Minor = 1` inside a comment and
+        report agreement with a line the compiler never sees.
+        """
+        errors = self.errors_for(
+            GOOD_HEADER.replace(
+                "    inline constexpr unsigned Minor = 1;",
+                "    // inline constexpr unsigned Minor = 1;",
+            )
+        )
+        self.assertTrue(
+            any("outside a comment" in e for e in errors), errors
+        )
+
+    def test_a_block_commented_constant_is_rejected(self):
+        errors = self.errors_for(
+            GOOD_HEADER.replace(
+                "    inline constexpr unsigned Patch = 0;",
+                "    /* inline constexpr unsigned Patch = 0; */",
+            )
+        )
+        self.assertTrue(any("outside a comment" in e for e in errors), errors)
+
+    def test_a_drifted_product_name_is_rejected(self):
+        errors = self.errors_for(GOOD_HEADER.replace('"Phoenix"', '"PhoenixGame"'))
+        self.assertTrue(any("Product is" in e for e in errors), errors)
+
+    def test_a_missing_header_is_rejected(self):
+        errors = self.errors_for(None)
+        self.assertTrue(any("the code has no product version" in e for e in errors), errors)
+
+    def test_the_wrong_namespace_is_rejected(self):
+        """Constants at gem scope are not the product version, whatever they say."""
+        errors = self.errors_for(
+            GOOD_HEADER.replace("namespace Phoenix::Version", "namespace Phoenix")
+        )
+        self.assertTrue(any("Phoenix::Version" in e for e in errors), errors)
+
+    def test_the_header_is_in_a_file_list_so_it_actually_ships(self):
+        """A header outside the build's file list is a file the build ignores."""
+        files = (
+            ROOT / "gems" / "PhoenixCore" / "Code" / "phoenixcore_api_files.cmake"
+        ).read_text(encoding="utf-8")
+        self.assertIn("Include/Phoenix/Core/PhoenixVersion.h", files)
+
+
+class ContractSchemaTests(unittest.TestCase):
+    def test_every_contract_file_has_a_schema(self):
+        for name, schema in validate_versions.CONTRACT_SCHEMAS.items():
+            with self.subTest(contract=name):
+                self.assertTrue(
+                    (validate_versions.CONFIG_DIR / "Schema" / schema).is_file(),
+                    f"{schema} is missing; {name} would be shape-checked by nothing",
+                )
+
+    def test_a_contract_with_an_unknown_field_is_rejected(self):
+        """additionalProperties: false, so a typo'd field fails instead of idling."""
+        version = dict(good_documents()["version.json"])
+        version["minorr"] = 2
+        self.assertTrue(
+            any("minorr" in e for e in problems({"version.json": version})),
+            "an unknown field was accepted",
+        )
+
+    def test_a_missing_schema_directory_is_reported(self):
+        """A skipped shape check must not read as a pass."""
+        with tempfile.TemporaryDirectory() as tmp:
+            directory = Path(tmp)
+            for name, document in good_documents().items():
+                (directory / name).write_text(
+                    json.dumps(document, indent=4) + "\n", encoding="utf-8"
+                )
+            errors, _ = validate_versions.validate(directory)
+        self.assertTrue(
+            any("shape-checked by nothing" in e for e in errors), errors
+        )

@@ -6,8 +6,7 @@
 
 namespace Phoenix
 {
-    class PhoenixCharacterModule final
-        : public AZ::Module
+    class PhoenixCharacterModule final : public AZ::Module
     {
     public:
         AZ_RTTI(PhoenixCharacterModule, "{73892EFC-F73D-4170-8B0F-46798A786162}", AZ::Module);
@@ -33,4 +32,4 @@ namespace Phoenix
     };
 
     AZ_DECLARE_MODULE_CLASS(PhoenixCharacterModule, Phoenix::PhoenixCharacterModule)
-}
+} // namespace Phoenix

@@ -9,9 +9,9 @@ namespace Phoenix
     //! the fastest route to the scaling risk in docs/tdd/10-risks.md.
     enum class CellActivation
     {
-        Unloaded,     //!< Nothing resident.
-        AssetLoaded,  //!< Assets resident, nothing simulating.
-        WorldActive,  //!< Entities activated, gameplay logic still off.
+        Unloaded, //!< Nothing resident.
+        AssetLoaded, //!< Assets resident, nothing simulating.
+        WorldActive, //!< Entities activated, gameplay logic still off.
         GameplayActive //!< Encounters, AI and gameplay logic running.
     };
 
@@ -27,4 +27,4 @@ namespace Phoenix
         //! Streaming priority; higher loads first within the budget.
         AZ::u32 priority = 0;
     };
-}
+} // namespace Phoenix

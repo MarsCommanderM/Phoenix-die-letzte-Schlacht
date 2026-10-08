@@ -8,4 +8,4 @@ namespace Phoenix
     //! *.AutoComponent.xml files under project/Code/Source/AutoGen and is
     //! deliberately not committed; see gems/PhoenixNetworking/Code/Source/AutoGen/README.md.
     void RegisterPhoenixNetworking();
-}
+} // namespace Phoenix

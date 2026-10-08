@@ -29,4 +29,4 @@ namespace Phoenix
     //! True when any experimental flag is enabled. Release packaging asserts
     //! this is false rather than trusting that nobody left one on.
     bool AnyExperimentalFeatureEnabled();
-}
+} // namespace Phoenix

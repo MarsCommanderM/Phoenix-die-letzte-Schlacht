@@ -7,16 +7,33 @@ behavior, and update an ADR for architectural changes.
 
 ```
 python -m pip install -r requirements-dev.txt
-python scripts/validate.py      # schemas, asset data, gem tiers
-python scripts/check_cmake.py   # every CMake file list parses and resolves
-python scripts/test.py          # repository contract tests
 
-python tools/validation/validate_project.py   # project + gem manifests
-python tools/validation/validate_assets.py    # asset authoring rules
-python tools/profiling/analyze_budget.py      # which budgets can gate
+python scripts/validate.py            # schemas, asset data, gem tiers
+python scripts/check_architecture.py  # cycles, forbidden includes, owners
+python scripts/check_cmake.py         # every CMake file list parses and resolves
+python scripts/test.py                # repository contract tests
+
+python tools/validation/validate_project.py        # project + gem manifests
+python tools/validation/validate_assets.py         # asset authoring rules
+python tools/validation/validate_asset_naming.py   # the naming convention
+python tools/validation/validate_registries.py     # tags + collision layers
+python tools/validation/validate_engine_patches.py # the engine patch register
+python tools/validation/validate_versions.py       # the three version contracts
+python tools/profiling/analyze_budget.py           # which budgets can gate
+
+clang-format --dry-run -Werror $(find gems project -name '*.h' -o -name '*.cpp')
 ```
 
-All three run in CI on every pull request (`.github/workflows/pull_request.yml`).
+Every one of these runs in CI on every pull request
+(`.github/workflows/pull_request.yml`), and
+`tests/Unit/test_tools.py` fails if a tool exists that no workflow runs — a
+validator that never executes passes forever and reads as coverage.
+
+`clang-format` comes from `requirements-dev.txt` rather than your system
+package manager, deliberately: different versions format the same file
+differently, so an unpinned formatter makes CI disagree with the check you
+just ran. `.clang-format` is the engine's own file, unmodified; see
+[ADR-0012](docs/adr/0012-cpp-tooling.md) before changing it.
 
 ## Architecture review
 

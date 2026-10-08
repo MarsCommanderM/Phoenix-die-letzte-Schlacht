@@ -8,8 +8,7 @@ namespace Phoenix
     {
         if (auto* serializeContext = azrtti_cast<AZ::SerializeContext*>(context))
         {
-            serializeContext->Class<PhoenixWorldSystemComponent, AZ::Component>()
-                ->Version(1);
+            serializeContext->Class<PhoenixWorldSystemComponent, AZ::Component>()->Version(1);
         }
     }
 
@@ -25,4 +24,4 @@ namespace Phoenix
     void PhoenixWorldSystemComponent::Deactivate()
     {
     }
-}
+} // namespace Phoenix

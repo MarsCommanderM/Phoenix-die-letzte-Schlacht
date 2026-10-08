@@ -13,7 +13,7 @@ namespace Phoenix::Config
             full += key;
             return full;
         }
-    }
+    } // namespace
 
     bool GetBool(AZStd::string_view key, bool fallback)
     {
@@ -57,4 +57,4 @@ namespace Phoenix::Config
         }
         return registry->GetType(FullKey(key)) != AZ::SettingsRegistryInterface::Type::NoType;
     }
-}
+} // namespace Phoenix::Config

@@ -7,4 +7,4 @@ namespace Phoenix
         AZ::Vector3 position = AZ::Vector3::CreateZero();
         float intensity = 0.0f;
     };
-}
+} // namespace Phoenix

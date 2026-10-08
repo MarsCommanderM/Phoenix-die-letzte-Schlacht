@@ -84,7 +84,7 @@ namespace Phoenix
     using WorldCellId = PhoenixId<WorldCellIdTag>;
     using SaveSlotId = PhoenixId<SaveSlotIdTag>;
     using NetworkObjectId = PhoenixId<NetworkObjectIdTag>;
-}
+} // namespace Phoenix
 
 namespace AZStd
 {
@@ -96,4 +96,4 @@ namespace AZStd
             return AZStd::hash<AZ::Uuid>()(id.GetValue());
         }
     };
-}
+} // namespace AZStd

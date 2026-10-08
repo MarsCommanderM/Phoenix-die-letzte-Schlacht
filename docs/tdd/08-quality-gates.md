@@ -38,9 +38,9 @@ Workflows live in `.github/workflows/`, which is where GitHub runs them.
 
 | Pipeline | Trigger | Runs |
 | --- | --- | --- |
-| `pull_request.yml` | every PR | static validation, repository tests, CMake structure check |
+| `pull_request.yml` | every PR | static validation, C++ format check, repository tests, CMake structure check |
 | `nightly.yml` | 02:00 daily | the above, plus full validation |
-| `release.yml` | manual | the above, plus source manifest generation |
+| `release.yml` | manual | validation, tests, CMake, plus build manifest generation |
 | `server.yml` | manual | server configuration validation |
 
 Currently enforced on every pull request, with no engine required:
@@ -48,11 +48,42 @@ Currently enforced on every pull request, with no engine required:
 | Gate | Checks |
 | --- | --- |
 | `scripts/validate.py` | schema validity; sample data against schema; id/filename agreement; mission→objective references; gem tier direction; CMake deps vs `gem.json` |
+| `scripts/check_architecture.py` | cyclic gem dependencies; forbidden cross-gem includes; unregistered AutoComponents; uncovered `CODEOWNERS` areas |
 | `scripts/check_cmake.py` | every CMake list file parses; every declared path exists; every `FILES_CMAKE`/`PLATFORM_INCLUDE_FILES` reference resolves |
+| `tools/validation/validate_project.py` | project and gem manifest contract; `project.json` against the gems on disk |
+| `tools/validation/validate_assets.py` | asset authoring rules beyond schema validity |
+| `tools/validation/validate_asset_naming.py` | the convention in `docs/production/naming.md`; case collisions across the whole tree |
+| `tools/validation/validate_registries.py` | declared tag namespaces; a symmetric, complete collision matrix with index 0 reserved |
+| `tools/validation/validate_engine_patches.py` | the engine patch register against the files on disk, both directions |
+| `tools/validation/validate_versions.py` | the three contract files against their schemas; the compatibility window; the save migration chain; `version.json` against `PhoenixVersion.h` |
+| `clang-format --dry-run -Werror` | every Phoenix source against `.clang-format`, with the formatter version pinned in `requirements-dev.txt` |
 | `scripts/test.py` | repository contract tests; **fails on an empty suite** |
 
 The last clause matters: the imported starter's test runner reported success
 while collecting zero tests. A gate that cannot fail is not a gate.
+
+That principle is applied to all of the above, not only to the runner. Every
+check that can reject something has a negative test in `tests/Unit/` that
+watches it reject: a cycle, an asymmetric collision matrix, an undeclared tag
+namespace, a commented-out version constant, a patch missing from the
+register, a misformatted source file. Two gates currently guard content that
+does not exist — there are no production assets and no engine patches — so
+they report what they actually checked instead of printing "passed", and their
+rules are exercised against synthetic input.
+
+The formatter version is pinned for the same reason. An unpinned
+`clang-format` formats differently between versions, which makes the gate
+disagree with the developer who already checked their work locally; the
+disagreement then gets resolved by disabling the gate.
+
+**`.clang-tidy` is declared but not a gate.** It needs
+`compile_commands.json`, which O3DE generates only when the project is
+configured against a registered engine. It joins the table at the milestone
+that produces a build agent; `tests/Unit/test_cpp_tooling.py` meanwhile
+verifies that every check it names is one the installed `clang-tidy` actually
+knows, because an unknown check name is silently ignored rather than
+rejected — the file would read as a 65-check gate while enforcing none. See
+[ADR-0012](../adr/0012-cpp-tooling.md).
 
 **Class C** — compile, asset processing, shader validation, rendering, physics,
 AI, networking, performance and soak stages require a registered O3DE engine

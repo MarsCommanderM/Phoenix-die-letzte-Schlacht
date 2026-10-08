@@ -6,4 +6,4 @@ namespace Phoenix
     {
         static constexpr const char* Name = "PhoenixPresentation";
     };
-}
+} // namespace Phoenix

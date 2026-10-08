@@ -9,11 +9,13 @@ project brief:
 | **S2** | MVP section 6A, "Prioritisiertes MVP-Backlog" |
 | **S3** | Master Technical Design & Production Specification, Revision 4.0 "Architecture Baseline" |
 
-Four earlier revisions were supplied afterwards and identified as superseded:
-AAA FPS TDD v1.0, Production Bible v3.0, Production Bible v3.2, and a
-standalone Executive Summary. They do not override S1–S3, but three of them
-decided things S1–S3 left open, and one corrected an error of mine. Those
-contributions are recorded in **C7–C10** below.
+Seven earlier revisions were supplied afterwards and identified as
+superseded: AAA FPS TDD v1.0 (twice, the second time complete with its
+executive summary), Production Bible v3.0, Production Bible v3.2, Master
+Baseline v5.0, Master Baseline v5.1, and a standalone Executive Summary. They
+do not override S1–S3, but several decided things S1–S3 left open, one
+corrected an error of mine, and one contradicted another. Those contributions
+are recorded in **C7–C15** below.
 
 They overlap heavily and **contradict each other in six places**. A
 specification that contradicts itself cannot be implemented against, so each
@@ -182,6 +184,145 @@ higher uniform rate is always better.
 
 **Adopted** into [07 — Budgets](07-budgets.md). C6 remains correct that the
 rate is a measured outcome; v3.0 adds that it is six measurements, not one.
+
+## C11 — The repository contract is a set of rules, not a file tree
+
+Master Baseline v5.1 §147–279 specifies the complete repository down to
+individual files: hundreds of headers, sources, asset directories, tool
+scripts, test files and documentation pages.
+
+Taken literally, that is a directive to create hundreds of empty files. v5.1
+itself forbids exactly that: §278 states a file exists only if it owns
+behavior, owns data, defines a contract, is required by the build or runtime,
+validates content, tests behavior, automates production, or documents an
+architectural decision. §129 of the same family of documents warns against a
+repository "aus tausenden leerer Dateien".
+
+**Resolved.** The specification is adopted as its **rules**, not its **tree**.
+What was implemented from it:
+
+| v5.1 section | Adopted as |
+| --- | --- |
+| §273 architecture validation | `scripts/check_architecture.py` — the four rules checkable today, with the other four named and their blockers stated |
+| §249 build manifest | a build identity block in `scripts/generate_manifest.py`: project commit, dirty-tree flag, engine version, gem versions, pinned third-party versions, the three contract versions, and a caller-supplied toolchain. Every field it cannot read becomes `null` with a warning rather than a guess, and the `buildId` is the hash of the manifest's own content, never a timestamp |
+| §251–253 version contracts | `project/Config/{version,network_protocol,save_schema}.json`, each with a JSON Schema in `project/Config/Schema/`, plus a validator that ties `save_schema.current` to the migration chain in code and `version.json` to `PhoenixVersion.h` |
+| §231 asset naming | `docs/production/naming.md` + `tools/validation/validate_asset_naming.py` |
+| §269–270 engine patches | `docs/engine-patches/` — register, template and `tools/validation/validate_engine_patches.py`, which compares register and directory in both directions. Empty by design |
+| §267 elevated review | the review table in `CONTRIBUTING.md` |
+| §278 file-creation rule | the checklist in `CONTRIBUTING.md` |
+| §150 C++ tooling | `.clang-format` copied verbatim from the engine at `2605.0` with the 65 sources reformatted to it, and a `.clang-tidy` of 65 individually named checks. See [ADR-0012](../adr/0012-cpp-tooling.md) |
+
+The last row is worth stating precisely, because the obvious reading is the
+wrong one. `.clang-format` is **not** derived from the code as it stood; it is
+the engine's own file, and the code was changed to match it. A config written
+to fit whatever the tree happened to contain would have invented a house style
+nobody shares and diverged permanently from the engine every contributor's
+editor is already set up for. ADR-0012 records the alternatives and the three
+classes of mechanical change that followed.
+
+The file lists in §158–245 are **not** adopted as a creation list. They are
+read as the intended shape, to be reached as each system becomes Class A.
+
+Two of the adopted gates guard content that does not exist yet: there are no
+production assets and no engine patches. That is the condition under which a
+validator becomes decoration, so both print what they actually checked instead
+of a bare "passed", and every rule in them is exercised against synthetic
+input in `tests/Unit/`. The first real asset and the first real patch meet a
+gate that has already been watched to fail.
+
+## C12 — Engine gem scope, and a dependency that was simply missing
+
+Master Baseline v5.0 §12 adds something no other source states: a list of
+engine gems that are **not** blanket requirements — `ScriptCanvas`,
+`ScriptEvents`, `GradientSignal`, `FastNoise`, `TracyProfiler`,
+`MultiplayerCompression`, `PythonAssetBuilder`, `AssetValidation`.
+
+**Adopted** into [01 — Engine Baseline](01-engine-baseline.md). Verified at
+`2605.0`: all exist except `TracyProfiler`, which is harmless in a
+do-not-enable list.
+
+The same section lists `SaveData` and `SceneProcessing` as core dependencies,
+which exposed a real gap: **`SaveData` was declared by no Phoenix gem at all**,
+although [ADR-0004](../adr/0004-save.md) builds the save architecture on it.
+`PhoenixCore` now declares it. `SceneProcessing` is deliberately not declared
+as a gem dependency — it is project-level asset-processing infrastructure.
+
+Wiring that dependency produced a second finding, recorded in
+`docs/implementation/verified-boundaries.md`: **engine gems do not all expose
+the same CMake targets.** `SaveData` exposes `.Static` and has no `.API`
+target, where `RecastNavigation` has the full three-target shape. Assuming
+`.API` for every engine gem would have failed at link time.
+
+## C13 — Named custom render passes were withdrawn
+
+| Source | Position |
+| --- | --- |
+| v1.0 §15.2 | Names eight custom passes: `PhoenixDepthPass`, `PhoenixLightingPass`, `PhoenixShadowPass`, `PhoenixVolumetricPass`, `PhoenixVelocityPass`, `PhoenixTemporalPass`, `PhoenixCinematicPass`, `PhoenixDebugPass` |
+| v5.0 §65 | "Nicht automatisch: PhoenixDepthPass PhoenixVelocityPass PhoenixTemporalPass nur weil diese Namen gut aussehen." Each custom pass requires a use case, performance cost, alternative analysis, owner and test |
+
+**Resolved in favour of v5.0**, the later and more disciplined position. The
+pass table in [05 — Rendering](05-rendering.md) is now explicitly an
+**ordering contract**, not a build list: it states which stages exist and in
+what order, and most are Atom features that get configured rather than
+written. The five-item requirement for creating a custom pass is recorded
+there.
+
+This matters because the table could otherwise be read as a commitment to
+write thirteen render passes, which is the exact failure v5.0 §65 warns
+about.
+
+## C14 — Correction thresholds are measured, not chosen
+
+v5.0 §82 adds: "Thresholds werden gemessen und nicht willkürlich gewählt."
+
+**Adopted** into [04 — Multiplayer](04-multiplayer.md). A threshold picked by
+feel either corrects constantly on a healthy connection or lets the client
+drift. It is derived from the network test matrix, and correction count is
+itself a telemetry metric, so a badly set threshold shows up in data rather
+than only in complaints.
+
+## C15 — Two registries the architecture assumed but never defined
+
+v1.0 §11.2 requires a central, versioned physics layer matrix; §12.6 requires
+a central, versioned gameplay tag registry that replaces free string
+comparison, with hierarchical names (`Character.Player`, `Surface.Metal`,
+`Objective.Control`).
+
+Several chapters already depended on these without them existing — the combat
+layer references a `surfaceTag`, and the collision model references layers.
+
+**Adopted** as versioned data, each with a JSON Schema in
+`project/Config/Schema/` and both enforced by
+`tools/validation/validate_registries.py`:
+`project/Config/Gameplay/tags.json` (21 tags across 7 namespaces) and
+`project/Config/Physics/layers.json` (8 layers, 11 symmetric colliding pairs).
+
+The schemas carry the shape. The validator carries the meaning, because every
+rule that matters here is a relation between entries and no schema can state
+one:
+
+- **Tags.** A tag's first segment must be a *declared* namespace. Without that
+  rule a typo in the first segment would be accepted as a brand-new namespace,
+  and the registry would document the typo instead of rejecting it — which is
+  the free-string failure §12.6 set out to end, merely relocated into JSON.
+- **Layers.** The reason is verified engine behaviour, not a preference. At
+  `2605.0`, `AzPhysics::CollisionLayers::GetLayer(name)` returns
+  `CollisionLayer::Default` when the name is not found, and the
+  `CollisionLayer(const AZStd::string&)` constructor goes through it
+  (`Code/Framework/AzFramework/AzFramework/Physics/Collision/CollisionLayers.h`).
+  A misspelled layer name therefore does not fail — it silently puts the
+  collider on layer 0. So index 0 must be `Default`, must be marked reserved,
+  and must collide with nothing: a collider that lands there by accident falls
+  through the world, which someone reports, rather than colliding with
+  everything, which looks almost right.
+- The matrix must also be **symmetric** and **complete**. An asymmetric matrix
+  is not a configuration but a contradiction, and an omitted layer leaves its
+  collisions to the engine default. Both are invisible in play until something
+  passes through something else.
+
+`maxLayers` is pinned to 64 as a schema constant, taken from
+`CollisionLayers::MaxCollisionLayers`, so an engine upgrade that changes the
+limit fails the schema instead of silently widening the allowed index range.
 
 ## Contributions adopted without conflict
 

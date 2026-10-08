@@ -25,4 +25,4 @@ namespace Phoenix
         float cooldownSeconds = 0.0f;
         ActionNetworkPolicy networkPolicy = ActionNetworkPolicy::ServerOnly;
     };
-}
+} // namespace Phoenix

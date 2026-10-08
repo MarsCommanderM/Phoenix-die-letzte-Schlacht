@@ -26,6 +26,11 @@ namespace Phoenix
             return false;
         }
 
+        // clang-format off
+        // One flag per line on purpose. This array must list every enumerator,
+        // and the one-per-line form makes adding or removing a flag a one-line
+        // diff that a reviewer cannot miss. Column-packed, the same change
+        // reflows the whole block and hides itself in the noise.
         constexpr FeatureFlag AllFlags[] = {
             FeatureFlag::ExperimentalRendering,
             FeatureFlag::ExperimentalAI,
@@ -34,7 +39,8 @@ namespace Phoenix
             FeatureFlag::DebugVisualization,
             FeatureFlag::PostLaunchFeature,
         };
-    }
+        // clang-format on
+    } // namespace
 
     AZStd::string_view ToString(FeatureFlag flag)
     {
@@ -85,4 +91,4 @@ namespace Phoenix
         }
         return false;
     }
-}
+} // namespace Phoenix

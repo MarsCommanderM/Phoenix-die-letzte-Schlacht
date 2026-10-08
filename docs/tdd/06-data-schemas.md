@@ -37,6 +37,25 @@ Class C means the file is created when the feature needs it, per the
 implementation rule in [09 — Roadmap](09-roadmap.md). The repository does not
 carry empty placeholder schemas.
 
+Configuration has its own schema directory, `project/Config/Schema/`, kept
+separate from asset authoring schemas because the two are validated by
+different tools at different times and have different owners:
+
+| Schema | Governs |
+| --- | --- |
+| `version.schema.json` | `project/Config/version.json` |
+| `network_protocol.schema.json` | `project/Config/network_protocol.json` |
+| `save_schema.schema.json` | `project/Config/save_schema.json` |
+| `tags.schema.json` | `project/Config/Gameplay/tags.json` |
+| `layers.schema.json` | `project/Config/Physics/layers.json` |
+
+Each carries the *shape* only. Every rule that matters about these five files
+is a relation — between fields, between entries, or between the file and the
+code — and no JSON Schema can state one. Those live in
+`tools/validation/validate_versions.py` and
+`tools/validation/validate_registries.py`; see [chapter 90](90-source-reconciliation.md)
+C15 for the two registries and why a typo in either is otherwise silent.
+
 `scripts/validate.py` enforces, for every present schema:
 
 - the schema itself is a valid JSON Schema (draft 2020-12)

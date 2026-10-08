@@ -19,6 +19,7 @@ decisions continue from 0006. See
 | [0009](0009-engine-fork-policy.md) | Engine Fork Policy | accepted |
 | [0010](0010-engine-dependency-verification.md) | Engine Dependency Verification | accepted |
 | [0011](0011-project-licence.md) | Project Licence | accepted |
+| [0012](0012-cpp-tooling.md) | C++ Tooling | accepted |
 
 ## Format
 

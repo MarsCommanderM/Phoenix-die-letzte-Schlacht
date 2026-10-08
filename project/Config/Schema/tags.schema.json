@@ -1,0 +1,46 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "Phoenix Gameplay Tag Registry",
+    "description": "Shape of project/Config/Gameplay/tags.json. Shape only: that a tag's namespace is declared, that names are unique and sorted, and that no namespace is dead are relations between entries, which JSON Schema cannot express. tools/validation/validate_registries.py enforces those.",
+    "type": "object",
+    "required": ["version", "namespaces", "tags"],
+    "properties": {
+        "$comment": { "type": "string" },
+        "version": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Registry version. Incremented when a tag is removed or renamed, which is a breaking change for saved data and authored assets."
+        },
+        "namespaces": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+                "type": "object",
+                "required": ["name", "description"],
+                "properties": {
+                    "name": { "type": "string", "pattern": "^[A-Z][A-Za-z0-9]*$" },
+                    "description": { "type": "string", "minLength": 10 }
+                },
+                "additionalProperties": false
+            }
+        },
+        "tags": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+                "type": "object",
+                "required": ["name", "description"],
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "pattern": "^[A-Z][A-Za-z0-9]*(\\.[A-Z][A-Za-z0-9]*)+$",
+                        "description": "Hierarchical, at least two segments. A bare 'Character' is a namespace, not a tag."
+                    },
+                    "description": { "type": "string", "minLength": 10 }
+                },
+                "additionalProperties": false
+            }
+        }
+    },
+    "additionalProperties": false
+}

@@ -10,4 +10,4 @@ namespace Phoenix
         const BuildInfo info{};
         AZ_Printf("Phoenix", "Phoenix runtime startup: %s / %s\n", info.buildId, info.engineBaseline);
     }
-}
+} // namespace Phoenix

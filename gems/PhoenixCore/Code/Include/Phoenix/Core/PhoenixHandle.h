@@ -63,4 +63,4 @@ namespace Phoenix
         IndexType m_index = InvalidIndex;
         GenerationType m_generation = 0;
     };
-}
+} // namespace Phoenix

@@ -1,0 +1,18 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "Phoenix Network Protocol Version",
+    "description": "Shape of project/Config/network_protocol.json. That minimumCompatible <= protocol <= maximumCompatible is a relation between fields; tools/validation/validate_versions.py enforces it.",
+    "type": "object",
+    "required": ["protocol", "minimumCompatible", "maximumCompatible"],
+    "properties": {
+        "$comment": { "type": "string" },
+        "protocol": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "The protocol version this build speaks."
+        },
+        "minimumCompatible": { "type": "integer", "minimum": 1 },
+        "maximumCompatible": { "type": "integer", "minimum": 1 }
+    },
+    "additionalProperties": false
+}

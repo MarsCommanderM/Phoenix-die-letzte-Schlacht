@@ -105,6 +105,55 @@ its `Amazon` root. It is a project settings file, so a `Phoenix` root is more
 consistent with the above — but changing it affects anything already reading
 those keys. Owner: Engineering. Target: M1.
 
+### Collision layer fallback
+
+`AzPhysics::CollisionLayers::GetLayer(name)` returns
+`CollisionLayer::Default` — index 0 — when the name is not found, and the
+`CollisionLayer(const AZStd::string&)` constructor routes through it. Read in
+`Code/Framework/AzFramework/AzFramework/Physics/Collision/CollisionLayers.h`
+and `.cpp` at tag `2605.0`; the engine's own doc comment states the fallback
+explicitly. `CollisionLayers::MaxCollisionLayers` is 64.
+
+Consequence: a misspelled collision layer name in data is not an error at
+runtime. It silently assigns layer 0. This is the whole reason
+`project/Config/Physics/layers.json` reserves index 0 as an inert `Default`
+and why `tools/validation/validate_registries.py` enforces it — a collider
+that falls through the world gets reported; one that collides with everything
+looks almost right. See [TDD chapter 90](../tdd/90-source-reconciliation.md)
+C15.
+
+## Claims corrected after the fact
+
+This section exists because a wrong claim that nobody revisits is worse than
+no claim: it reads as verification. Two entries above were already corrected
+this way (`Atom`, and the settings-registry roots). One more belongs here, and
+it is about this repository's own history rather than the engine.
+
+**The commit message for `040e572` is wrong.** It states that the two gates it
+added, `scripts/check_architecture.py` and
+`tools/validation/validate_versions.py`, "were adversarially reviewed for
+vacuousness specifically". They were not. The review step that was supposed to
+do it did not complete, and the message was written as though it had. The
+commit is pushed, so it cannot be amended without rewriting a branch that is
+already under review; the correction lives here instead.
+
+What is true now, and checkable rather than asserted:
+
+- `tests/Unit/test_architecture.py` carries negative tests for every rule the
+  gate implements — direct, indirect and self cycles; a cycle reported once
+  rather than once per member; four distinct ways of spelling a route into
+  another gem's source tree; an unlisted AutoComponent XML; a declared path
+  that does not exist; an uncovered `CODEOWNERS` area; a pattern with no
+  owner; a catch-all that warns instead of passing silently.
+- `tests/Unit/test_versions.py` does the same for the version contracts,
+  including the one failure mode a grepping check would miss: a constant that
+  is **commented out** in `PhoenixVersion.h` but still matches the regex. The
+  parser strips comments, and the test proves it.
+
+The standard this repository set for itself in ADR-0011 applies to review as
+much as to hashes: a recorded verification that cannot be checked against what
+was actually done is worse than none, because it looks like verification.
+
 ## Not verified
 
 These need a registered engine or an owner's decision.

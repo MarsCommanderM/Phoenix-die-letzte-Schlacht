@@ -139,3 +139,145 @@ class BudgetAnalysisTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class EveryToolIsRunAndListedTests(unittest.TestCase):
+    """A tool nobody runs is not a gate. A tool nobody lists is not findable.
+
+    Both failures are quiet. A validator added to tools/ but never wired into
+    a workflow passes forever by never executing, and the next person reads
+    its name in CONTRIBUTING and assumes it is enforced. A tool missing from
+    tools/README.md still runs, but nobody learns it exists until they
+    duplicate it.
+
+    These checks discover the tool set from disk rather than from a list kept
+    here, so a tool added tomorrow is covered without anyone remembering to
+    extend this file.
+    """
+
+    #: Tools that deliberately do not run in CI, each with the reason. Keeping
+    #: this empty-by-default and explicit is the point: an exemption has to be
+    #: argued in a diff rather than achieved by forgetting.
+    NOT_IN_CI: dict[str, str] = {
+        "migration/migrate_save.py": (
+            "operates on a save file supplied by the caller; it has no repository-wide "
+            "invocation. Its behaviour is covered by SaveMigrationTests above."
+        ),
+    }
+
+    def tools(self) -> list[str]:
+        found = []
+        for path in sorted(TOOLS.rglob("*.py")):
+            if "__pycache__" in path.parts or path.name.startswith("_"):
+                continue
+            found.append(path.relative_to(TOOLS).as_posix())
+        return found
+
+    def test_there_are_tools_to_check(self):
+        """Guards the three tests below against an empty discovery."""
+        self.assertGreaterEqual(len(self.tools()), 8)
+
+    def test_every_tool_runs_clean_on_the_committed_tree(self):
+        for relative in self.tools():
+            if relative in self.NOT_IN_CI:
+                continue
+            with self.subTest(tool=relative):
+                result = run_tool(relative)
+                self.assertEqual(
+                    result.returncode, 0, (result.stdout + result.stderr)[:3000]
+                )
+
+    def test_every_tool_is_listed_in_the_readme(self):
+        text = (TOOLS / "README.md").read_text(encoding="utf-8")
+        for relative in self.tools():
+            with self.subTest(tool=relative):
+                self.assertIn(
+                    relative,
+                    text,
+                    f"tools/{relative} is not in tools/README.md; add a row describing "
+                    "what it does",
+                )
+
+    def test_every_tool_is_invoked_by_a_workflow(self):
+        workflows = "\n".join(
+            path.read_text(encoding="utf-8")
+            for path in sorted((ROOT / ".github" / "workflows").glob("*.yml"))
+        )
+        for relative in self.tools():
+            with self.subTest(tool=relative):
+                if relative in self.NOT_IN_CI:
+                    self.assertTrue(
+                        self.NOT_IN_CI[relative].strip(),
+                        "an exemption needs a reason",
+                    )
+                    continue
+                self.assertIn(
+                    f"tools/{relative}",
+                    workflows,
+                    f"tools/{relative} is in no workflow, so it never runs. A validator "
+                    "that never executes passes forever and reads as coverage",
+                )
+
+    def test_the_readme_does_not_claim_a_count_that_can_drift(self):
+        """'All four run' was true once. Counts in prose go stale silently."""
+        text = (TOOLS / "README.md").read_text(encoding="utf-8")
+        count = len(self.tools())
+        words = {
+            4: "four", 5: "five", 6: "six", 7: "seven", 8: "eight", 9: "nine",
+            10: "ten", 11: "eleven", 12: "twelve",
+        }
+        for number, word in words.items():
+            if number == count:
+                continue
+            with self.subTest(claim=word):
+                self.assertNotIn(
+                    f"All {word} run",
+                    text,
+                    f"tools/README.md claims 'All {word} run' but there are {count} tools",
+                )
+
+
+class ContributingListsEveryLocalCheckTests(unittest.TestCase):
+    """CONTRIBUTING tells contributors what to run before opening a PR.
+
+    When it falls behind, the cost lands on the contributor: they run the five
+    commands the file lists, open the PR, and CI fails on the sixth. The file
+    said "All three run in CI" while listing six commands, which is how this
+    test came to exist.
+    """
+
+    def contributing(self) -> str:
+        return (ROOT / "CONTRIBUTING.md").read_text(encoding="utf-8")
+
+    def test_it_lists_every_tool_ci_runs(self):
+        text = self.contributing()
+        exempt = EveryToolIsRunAndListedTests.NOT_IN_CI
+        for path in sorted(TOOLS.rglob("*.py")):
+            if "__pycache__" in path.parts or path.name.startswith("_"):
+                continue
+            relative = path.relative_to(TOOLS).as_posix()
+            if relative in exempt:
+                continue
+            with self.subTest(tool=relative):
+                self.assertIn(
+                    f"tools/{relative}",
+                    text,
+                    f"CONTRIBUTING.md does not tell contributors to run "
+                    f"tools/{relative}, so they will learn about it from a red CI run",
+                )
+
+    def test_it_lists_every_repository_script_ci_runs(self):
+        text = self.contributing()
+        for script in ("validate.py", "check_architecture.py", "check_cmake.py", "test.py"):
+            with self.subTest(script=script):
+                self.assertIn(f"scripts/{script}", text)
+
+    def test_it_mentions_the_format_check(self):
+        self.assertIn("clang-format", self.contributing())
+
+    def test_it_claims_no_count_that_can_drift(self):
+        """'All three run in CI' was the original wording, with six listed."""
+        text = self.contributing()
+        for word in ("All three run", "All four run", "All five run", "All six run"):
+            with self.subTest(claim=word):
+                self.assertNotIn(word, text)

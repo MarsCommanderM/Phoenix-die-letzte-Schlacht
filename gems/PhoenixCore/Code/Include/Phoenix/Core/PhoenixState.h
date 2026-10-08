@@ -74,4 +74,4 @@ namespace Phoenix
         StateEnum m_previous{};
         AZStd::vector<Transition> m_allowed;
     };
-}
+} // namespace Phoenix

@@ -28,4 +28,4 @@ namespace Phoenix
     //! severity: Warning and above are raised as warnings/errors rather than
     //! being flattened into plain output.
     void EmitDiagnostic(const DiagnosticEvent& event);
-}
+} // namespace Phoenix

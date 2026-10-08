@@ -9,8 +9,7 @@ namespace Phoenix
     //! Declared in a header so that PhoenixAIModule can register its
     //! descriptor; a component whose type is only visible inside its own
     //! translation unit can never be reflected or created.
-    class PhoenixAISystemComponent final
-        : public AZ::Component
+    class PhoenixAISystemComponent final : public AZ::Component
     {
     public:
         AZ_COMPONENT(PhoenixAISystemComponent, "{8F31597D-1DB0-4CE8-9DE5-361B68569F73}");
@@ -22,4 +21,4 @@ namespace Phoenix
         void Activate() override;
         void Deactivate() override;
     };
-}
+} // namespace Phoenix

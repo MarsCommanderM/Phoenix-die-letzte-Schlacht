@@ -9,8 +9,7 @@ namespace Phoenix
     //! Declared in a header so that PhoenixGameplayModule can register its
     //! descriptor; a component whose type is only visible inside its own
     //! translation unit can never be reflected or created.
-    class PhoenixGameplaySystemComponent final
-        : public AZ::Component
+    class PhoenixGameplaySystemComponent final : public AZ::Component
     {
     public:
         AZ_COMPONENT(PhoenixGameplaySystemComponent, "{DF41F8AC-F00B-41B3-9594-7B7838B83CE4}");
@@ -22,4 +21,4 @@ namespace Phoenix
         void Activate() override;
         void Deactivate() override;
     };
-}
+} // namespace Phoenix

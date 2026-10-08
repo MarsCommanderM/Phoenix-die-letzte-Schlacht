@@ -13,4 +13,4 @@ namespace Phoenix
     {
         AZ::Vector3 value = AZ::Vector3::CreateZero();
     };
-}
+} // namespace Phoenix

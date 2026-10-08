@@ -23,5 +23,5 @@ namespace Phoenix
         //! True when the key is present, which distinguishes "configured to the
         //! default" from "not configured" — a distinction a fallback hides.
         bool IsSet(AZStd::string_view key);
-    }
-}
+    } // namespace Config
+} // namespace Phoenix

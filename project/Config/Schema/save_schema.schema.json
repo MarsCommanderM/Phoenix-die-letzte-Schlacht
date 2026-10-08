@@ -1,0 +1,21 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "Phoenix Save Schema Version",
+    "description": "Shape of project/Config/save_schema.json. That 'current' equals the version tools/migration/migrate_save.py writes, and that every step from minimumReadable is a registered migration, are code relations; tools/validation/validate_versions.py enforces them.",
+    "type": "object",
+    "required": ["current", "minimumReadable"],
+    "properties": {
+        "$comment": { "type": "string" },
+        "current": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "The schema version this build writes."
+        },
+        "minimumReadable": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "The oldest schema version this build can migrate forward."
+        }
+    },
+    "additionalProperties": false
+}

@@ -22,6 +22,9 @@ jobs:
       - run: python scripts/check_architecture.py
       - run: python tools/validation/validate_project.py
       - run: python tools/validation/validate_assets.py
+      - run: python tools/validation/validate_asset_naming.py
+      - run: python tools/validation/validate_registries.py
+      - run: python tools/validation/validate_engine_patches.py
       - run: python tools/validation/validate_versions.py
       - run: python tools/profiling/analyze_budget.py
       - run: python scripts/test.py

@@ -6,8 +6,7 @@
 
 namespace Phoenix
 {
-    class PhoenixMovementComponent final
-        : public AZ::Component
+    class PhoenixMovementComponent final : public AZ::Component
     {
     public:
         AZ_COMPONENT(PhoenixMovementComponent, "{4D9D0B11-2E42-4A5A-8A37-7B1E4E2D1001}");
@@ -31,4 +30,4 @@ namespace Phoenix
         AZ::Vector3 m_moveIntent = AZ::Vector3::CreateZero();
         MovementState m_state = MovementState::Idle;
     };
-}
+} // namespace Phoenix

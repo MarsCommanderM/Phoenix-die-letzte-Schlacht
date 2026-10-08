@@ -8,8 +8,7 @@ namespace Phoenix
     {
         if (auto* serializeContext = azrtti_cast<AZ::SerializeContext*>(context))
         {
-            serializeContext->Class<PhoenixMovementComponent, AZ::Component>()
-                ->Version(1);
+            serializeContext->Class<PhoenixMovementComponent, AZ::Component>()->Version(1);
         }
     }
 
@@ -34,4 +33,4 @@ namespace Phoenix
         // are not implemented in this baseline.
         m_state = intent.GetLengthSq() > MoveIntentEpsilonSq ? MovementState::Walk : MovementState::Idle;
     }
-}
+} // namespace Phoenix
