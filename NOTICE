@@ -1,15 +1,16 @@
 Phoenix
-Copyright 2026 the Phoenix authors
+Copyright 2026 Michael Braunschweig
 
 This product is licensed under the Apache License, Version 2.0.
 See the LICENSE file for the full licence text.
 
     SPDX-License-Identifier: Apache-2.0
 
-Replace "the Phoenix authors" above with the legal name of the copyright
-holder (a person or a company) before distributing. The licence itself is
-valid as written; the attribution line is not a legal entity until it names
-one.
+This line is what every copy of this software and every derivative work must
+carry, under section 4(d) of the licence. It names a natural person. If the
+rights are later assigned to a company, this line changes with them -- and the
+copies already distributed keep the old one, which is why it is worth getting
+right before the first release rather than after.
 
 
 Third-party notices

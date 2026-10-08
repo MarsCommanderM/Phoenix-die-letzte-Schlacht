@@ -169,8 +169,7 @@ These need a registered engine or an owner's decision.
   gem exists and is the right aggregate; what a project needs beyond it
   depends on which features are used.
 - ~~`LICENSE` versus the gem manifests.~~ **Resolved.** The project owner chose
-  Apache-2.0; see [ADR-0011](../adr/0011-project-licence.md). `LICENSE` now
-  holds the verbatim Apache-2.0 text and the manifests already matched. One
-  item remains: the attribution line in `NOTICE` reads "the Phoenix authors",
-  which is not a legal entity and must name a person or company before
-  distribution.
+  Apache-2.0; see [ADR-0011](../adr/0011-project-licence.md). `LICENSE` holds
+  the verbatim Apache-2.0 text, the manifests already matched, and `NOTICE`
+  now names the copyright holder: Michael Braunschweig. Nothing in this item
+  is open.

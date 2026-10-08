@@ -67,9 +67,13 @@ third-party notices.
   The decision was made with that effect stated.
 - Apache-2.0 is compatible with O3DE, which is itself Apache-2.0 OR MIT, so
   the engine imposes no conflict.
-- The attribution line in `NOTICE` reads "the Phoenix authors". That is not a
-  legal entity. It must name a person or company before distribution; the
-  licence grant is valid as written either way.
+- **The copyright holder is Michael Braunschweig**, named by the project owner
+  and recorded in `NOTICE`. Section 4(d) of the licence makes that line
+  travel with every copy and every derivative work, so it is checked by
+  `tests/Unit/test_documentation.py` rather than left to be noticed. A later
+  assignment to a company changes the line going forward only: copies already
+  distributed keep the name they were shipped with, which is why this was
+  worth settling before the first release.
 - Reversing this is possible for future versions but **not retroactive**:
   anyone who received a copy under Apache-2.0 keeps those rights for that
   copy. If the intent was to keep the code private, that decision is cheapest
