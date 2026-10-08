@@ -25,9 +25,17 @@ hardware**, which is not yet fixed. Rather than invent numbers that would
 later be cited as decisions, this chapter fixes the **structure, ownership and
 enforcement** of the budgets and marks the values **OPEN**.
 
-**OPEN** — reference hardware specification. Owner: Engineering. Target: M1.
-**OPEN** — all target/warning/critical values. Owner: per row below. Target: M5
-(Performance Baseline), measured, not estimated.
+**Decided:** the client frame target is **stable 60 FPS on the defined
+reference hardware** (16.67 ms), with 120 FPS a should-have on strong
+hardware. Frame-time *stability* outranks average frame rate: a build that
+averages 70 FPS with regular 40 ms spikes fails this target and a steady 60
+passes it.
+
+**OPEN** — the reference hardware itself. The 60 FPS figure is only meaningful
+once the hardware it applies to is named. Owner: Engineering. Target: M1.
+
+**OPEN** — warning and critical thresholds, and the per-area breakdown below.
+Owner: per row. Target: M5 (Performance Baseline), measured, not estimated.
 
 This is deliberate. A budget invented without a measurement scene is a number
 nobody can defend in review, and it would make acceptance criterion 3
@@ -42,6 +50,9 @@ the budget is centrally administered.
 Total frame budget =
     Gameplay + Animation + Physics + AI + Rendering + Audio + Streaming + UI
 ```
+
+Total frame budget: **16.67 ms** (60 FPS). The split across areas is OPEN —
+the total is decided, its distribution is not.
 
 | Area | Owner | Value |
 | --- | --- | --- |
@@ -66,6 +77,22 @@ experience as a consistently slow one.
 Tick target, warning and hard limit: **OPEN** (see
 [90 — Source Reconciliation](90-source-reconciliation.md) C6 — the rate is a
 measured outcome, not an assumption).
+
+**There is no single tick rate.** Six rates are measured and tuned
+separately, and conflating them is how "just raise the tick rate" becomes a
+performance decision nobody can evaluate:
+
+| Rate | Governs |
+| --- | --- |
+| Input rate | how often client input is sampled |
+| Simulation rate | the fixed step gameplay and movement advance on |
+| Replication rate | how often state is sent |
+| Snapshot rate | how often a full state snapshot is produced |
+| Render rate | variable; decoupled from all of the above |
+| Interpolation rate | how remote entities are smoothed between updates |
+
+A blanket claim such as "128 Hz is always better" is rejected: each rate is
+benchmarked against its own cost.
 
 On exceeding the limit, in this order:
 

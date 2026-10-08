@@ -1,60 +1,194 @@
 {
-    "$comment": "Budget STRUCTURE is fixed; VALUES are deliberately null. See docs/tdd/07-budgets.md. A budget invented without a measurement scene is a number nobody can defend in review, and it would make acceptance criterion 3 unfalsifiable. Values are set at milestone M5 against reference hardware, measured rather than estimated.",
+    "$comment": "Budget STRUCTURE is fixed. Values are set only where a document decides them; the rest are null on purpose. See docs/tdd/07-budgets.md. A budget invented without a measurement scene is a number nobody can defend in review.",
     "referenceHardware": null,
     "client": {
         "frame": {
-            "targetMs": null, "warningMs": null, "criticalMs": null,
-            "measurement": null, "owner": "Engineering"
+            "targetMs": 16.67,
+            "warningMs": null,
+            "criticalMs": null,
+            "measurement": null,
+            "owner": "Engineering",
+            "$comment": "60 FPS on the defined reference hardware (Must-have). 120 FPS on strong hardware is a should-have. Stability outranks average: regular spikes fail this target even at a higher mean. Warning/critical remain OPEN pending M5."
         },
         "areas": {
-            "gameplay":  { "targetMs": null, "warningMs": null, "criticalMs": null, "owner": "Gameplay" },
-            "animation": { "targetMs": null, "warningMs": null, "criticalMs": null, "owner": "Presentation" },
-            "physics":   { "targetMs": null, "warningMs": null, "criticalMs": null, "owner": "Engineering" },
-            "ai":        { "targetMs": null, "warningMs": null, "criticalMs": null, "owner": "AI" },
-            "rendering": { "targetMs": null, "warningMs": null, "criticalMs": null, "owner": "Rendering" },
-            "audio":     { "targetMs": null, "warningMs": null, "criticalMs": null, "owner": "Audio" },
-            "streaming": { "targetMs": null, "warningMs": null, "criticalMs": null, "owner": "Engineering" },
-            "ui":        { "targetMs": null, "warningMs": null, "criticalMs": null, "owner": "UI" }
+            "gameplay": {
+                "targetMs": null,
+                "warningMs": null,
+                "criticalMs": null,
+                "owner": "Gameplay"
+            },
+            "animation": {
+                "targetMs": null,
+                "warningMs": null,
+                "criticalMs": null,
+                "owner": "Presentation"
+            },
+            "physics": {
+                "targetMs": null,
+                "warningMs": null,
+                "criticalMs": null,
+                "owner": "Engineering"
+            },
+            "ai": {
+                "targetMs": null,
+                "warningMs": null,
+                "criticalMs": null,
+                "owner": "AI"
+            },
+            "rendering": {
+                "targetMs": null,
+                "warningMs": null,
+                "criticalMs": null,
+                "owner": "Rendering"
+            },
+            "audio": {
+                "targetMs": null,
+                "warningMs": null,
+                "criticalMs": null,
+                "owner": "Audio"
+            },
+            "streaming": {
+                "targetMs": null,
+                "warningMs": null,
+                "criticalMs": null,
+                "owner": "Engineering"
+            },
+            "ui": {
+                "targetMs": null,
+                "warningMs": null,
+                "criticalMs": null,
+                "owner": "UI"
+            }
+        },
+        "highEnd": {
+            "targetMs": 8.33,
+            "priority": "should-have",
+            "$comment": "120 FPS on strong hardware; not a Must-have gate."
         }
     },
     "server": {
         "tick": {
             "rateHz": null,
-            "targetMs": null, "warningMs": null, "criticalMs": null,
+            "targetMs": null,
+            "warningMs": null,
+            "criticalMs": null,
             "varianceCriticalMs": null,
-            "measurement": null, "owner": "Engineering",
-            "$comment": "Rate is a measured outcome, not an assumption. See docs/tdd/90-source-reconciliation.md C6."
+            "measurement": null,
+            "owner": "Engineering",
+            "$comment": "No single tick rate: input, simulation, replication, snapshot, render and interpolation rates are measured separately. See docs/tdd/07-budgets.md."
         },
         "areas": {
-            "simulation":  { "targetMs": null, "owner": "Gameplay" },
-            "ai":          { "targetMs": null, "owner": "AI" },
-            "physics":     { "targetMs": null, "owner": "Engineering" },
-            "replication": { "targetMs": null, "owner": "Online" },
-            "network":     { "targetMs": null, "owner": "Online" },
-            "persistence": { "targetMs": null, "owner": "Online" }
+            "simulation": {
+                "targetMs": null,
+                "owner": "Gameplay"
+            },
+            "ai": {
+                "targetMs": null,
+                "owner": "AI"
+            },
+            "physics": {
+                "targetMs": null,
+                "owner": "Engineering"
+            },
+            "replication": {
+                "targetMs": null,
+                "owner": "Online"
+            },
+            "network": {
+                "targetMs": null,
+                "owner": "Online"
+            },
+            "persistence": {
+                "targetMs": null,
+                "owner": "Online"
+            }
         }
     },
     "memory": {
-        "textures":   { "targetBytes": null, "warningBytes": null, "hardLimitBytes": null },
-        "meshes":     { "targetBytes": null, "warningBytes": null, "hardLimitBytes": null },
-        "animations": { "targetBytes": null, "warningBytes": null, "hardLimitBytes": null },
-        "audio":      { "targetBytes": null, "warningBytes": null, "hardLimitBytes": null },
-        "shaders":    { "targetBytes": null, "warningBytes": null, "hardLimitBytes": null },
-        "world":      { "targetBytes": null, "warningBytes": null, "hardLimitBytes": null },
-        "gameplay":   { "targetBytes": null, "warningBytes": null, "hardLimitBytes": null },
-        "streaming":  { "targetBytes": null, "warningBytes": null, "hardLimitBytes": null },
-        "physics":    { "targetBytes": null, "warningBytes": null, "hardLimitBytes": null },
-        "network":    { "targetBytes": null, "warningBytes": null, "hardLimitBytes": null }
+        "textures": {
+            "targetBytes": null,
+            "warningBytes": null,
+            "hardLimitBytes": null
+        },
+        "meshes": {
+            "targetBytes": null,
+            "warningBytes": null,
+            "hardLimitBytes": null
+        },
+        "animations": {
+            "targetBytes": null,
+            "warningBytes": null,
+            "hardLimitBytes": null
+        },
+        "audio": {
+            "targetBytes": null,
+            "warningBytes": null,
+            "hardLimitBytes": null
+        },
+        "shaders": {
+            "targetBytes": null,
+            "warningBytes": null,
+            "hardLimitBytes": null
+        },
+        "world": {
+            "targetBytes": null,
+            "warningBytes": null,
+            "hardLimitBytes": null
+        },
+        "gameplay": {
+            "targetBytes": null,
+            "warningBytes": null,
+            "hardLimitBytes": null
+        },
+        "streaming": {
+            "targetBytes": null,
+            "warningBytes": null,
+            "hardLimitBytes": null
+        },
+        "physics": {
+            "targetBytes": null,
+            "warningBytes": null,
+            "hardLimitBytes": null
+        },
+        "network": {
+            "targetBytes": null,
+            "warningBytes": null,
+            "hardLimitBytes": null
+        }
     },
     "gpu": {
-        "geometry":   { "targetMs": null, "owner": "Rendering" },
-        "shadow":     { "targetMs": null, "owner": "Rendering" },
-        "lighting":   { "targetMs": null, "owner": "Rendering" },
-        "material":   { "targetMs": null, "owner": "Rendering" },
-        "vfx":        { "targetMs": null, "owner": "VFX" },
-        "post":       { "targetMs": null, "owner": "Rendering" },
-        "volumetric": { "targetMs": null, "owner": "Rendering" },
-        "ui":         { "targetMs": null, "owner": "UI" }
+        "geometry": {
+            "targetMs": null,
+            "owner": "Rendering"
+        },
+        "shadow": {
+            "targetMs": null,
+            "owner": "Rendering"
+        },
+        "lighting": {
+            "targetMs": null,
+            "owner": "Rendering"
+        },
+        "material": {
+            "targetMs": null,
+            "owner": "Rendering"
+        },
+        "vfx": {
+            "targetMs": null,
+            "owner": "VFX"
+        },
+        "post": {
+            "targetMs": null,
+            "owner": "Rendering"
+        },
+        "volumetric": {
+            "targetMs": null,
+            "owner": "Rendering"
+        },
+        "ui": {
+            "targetMs": null,
+            "owner": "UI"
+        }
     },
     "network": {
         "bytesPerSecondPerPlayer": null,

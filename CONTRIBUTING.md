@@ -10,6 +10,10 @@ python -m pip install -r requirements-dev.txt
 python scripts/validate.py      # schemas, asset data, gem tiers
 python scripts/check_cmake.py   # every CMake file list parses and resolves
 python scripts/test.py          # repository contract tests
+
+python tools/validation/validate_project.py   # project + gem manifests
+python tools/validation/validate_assets.py    # asset authoring rules
+python tools/profiling/analyze_budget.py      # which budgets can gate
 ```
 
 All three run in CI on every pull request (`.github/workflows/pull_request.yml`).

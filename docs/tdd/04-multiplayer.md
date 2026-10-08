@@ -54,11 +54,43 @@ For approved state:
 
 Consequences that bind other systems:
 
-- Simulation must be **deterministic** for a given input sequence and start
-  state. This is why movement uses a fixed step ([03](03-runtime-systems.md))
-  and why animation must not drive position.
-- Any simulation state that participates in prediction must be
-  serialisable and rewindable.
+- **Phoenix's own movement simulation** must be reproducible for a given input
+  sequence and start state. This is why movement uses a fixed step
+  ([03](03-runtime-systems.md)) and why animation must not drive position.
+- Any simulation state that participates in prediction must be serialisable
+  and rewindable.
+
+### What reconciliation must not assume
+
+Reconciliation is **not** a deterministic physics rollback. O3DE's PhysX
+simulation is not documented as generally deterministic, and O3DE ships PhysX
+4 as the default with PhysX 5 as a separate gem (which is why this project
+declares `PhysX5`; see
+[ADR-0010](../adr/0010-engine-dependency-verification.md)).
+
+The model is therefore:
+
+```
+server-authoritative state  +  client prediction  +  correction
+```
+
+and **not**:
+
+```
+rewind the physics scene and re-simulate it identically
+```
+
+Concretely: a correction replaces client state with server state and replays
+the client's unacknowledged *inputs* through Phoenix's own movement rules. It
+does not assume that re-running the PhysX scene from a restored snapshot
+reproduces the same contacts. Any design that needs bit-identical physics
+replay — lockstep, deterministic replay of physics-driven objects, rollback
+netcode over rigid bodies — is out of scope and would need an ADR and a
+different physics strategy.
+
+This is also why physics-driven objects (ragdolls, debris, destruction) are
+**server-authoritative state, not predicted**: their outcome cannot be
+predicted reproducibly.
 
 ## Interest management
 
@@ -69,12 +101,17 @@ the difference between a working build and a saturated one.
 | --- | --- |
 | Cell relevance | An entity in a cell no client has as gameplay-active is not replicated |
 | Distance and visibility relevance | Per-client filtering within relevant cells |
-| Priority | Within a client's budget, nearer and gameplay-critical entities replicate first |
+| Priority | Explicit levels, highest first: **0** local player, **1** nearby players, **2** active objectives, **3** nearby world events, **4** distant state |
 | Replication budget | A per-client per-tick cap on replicated state; exceeding it defers low-priority entities rather than growing the packet |
 
 The budget is a hard cap, not a target. An uncapped replication set makes
 bandwidth a function of world content, which cannot be load-tested
 meaningfully.
+
+Visibility alone does not determine relevance: a distant objective can be
+gameplay-critical while a near prop is not. Relevance is computed from
+distance, visibility, team relationship, objective relevance, audio relevance
+and gameplay importance together.
 
 ## Component schemas
 
@@ -92,7 +129,7 @@ The schemas are specified in
 | --- | --- |
 | Server build | Dedicated, headless, Linux |
 | Tick rate | **OPEN** — a measured outcome, not an assumption. See [07 — Budgets](07-budgets.md) |
-| Players per server | Measurement ladder 2 → 8 → 16 → 32; 50 is a separate stretch gate |
+| Players per server | **16–32 is the credible launch target**; the ladder is 2 → 8 → 16 → 32, with 50 a stretch test and a post-launch format if it is not stable |
 | Validation | Every client-originated action validated server-side |
 | Soak | 24-hour soak test required before release (acceptance criterion 5) |
 

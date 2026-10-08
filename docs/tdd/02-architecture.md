@@ -103,6 +103,26 @@ lists exactly its own sources — the project target never restates gem files,
 because doing so would both duplicate compilation and invert the dependency
 direction above.
 
+## Forbidden dependencies
+
+The tier table forbids upward dependencies between gems. These additional
+prohibitions cut across tiers and are listed because each one has been
+attempted in a shipped engine somewhere and each one is expensive to undo:
+
+| Forbidden | Why |
+| --- | --- |
+| Rendering → gameplay rules | makes the simulation depend on what is drawn; a headless server then cannot run it |
+| Audio → network authority | an audio failure must never be able to affect authoritative state |
+| UI → PhysX internals | couples the HUD to a solver version |
+| Asset pipeline → runtime gameplay | a build step that needs the game running cannot be reproduced in CI |
+| Client presentation → server persistence | lets a client write what only the server may own |
+| Gameplay data → engine private internals | silently pins the project to one engine revision |
+
+Where a system appears to need one of these, the answer is an event or a
+public interface in the permitted direction — not a private include, and not
+a global singleton reached sideways. A dependency cycle may not be hidden
+behind either.
+
 ## Adding a gem
 
 1. Create the gem with the target shape above.

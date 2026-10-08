@@ -93,6 +93,25 @@ criterion is what matters.
 Multiplayer prototype work begins after M5, not before — see
 [90](90-source-reconciliation.md) C1.
 
+## The multiplayer decision gate
+
+After the campaign vertical slice, Production decides between two paths. The
+decision is binding, not revisited per sprint, and either path is a success.
+
+**Path A — multiplayer at launch.** Admissible only with all of: a stable
+dedicated-server baseline; prediction and reconciliation that hold under the
+network test matrix; one defined mode; a defined map count; a matchmaking
+prototype; server load within budget; a security and QA baseline.
+
+**Path B — multiplayer post-launch.** Requires: a stable network
+architecture; a dedicated-server build; tested replication interfaces; a
+documented multiplayer roadmap; and **no campaign delay attributable to
+multiplayer content**.
+
+Under Path B the multiplayer code is stabilised while its content and public
+services are frozen. Nothing is thrown away, because the architecture was
+Must-have either way ([11 — Launch Scope](11-scope.md)).
+
 ## Milestones
 
 | Milestone | Gate |
@@ -141,6 +160,27 @@ higher-priority one.**
 | Accessibility | | | ✓ | ✓ | |
 | Multiplayer | | | | | ✓ |
 | Backend | | | | | ✓ |
+
+## Production phases
+
+The engineering sequence above sits inside the production phase model:
+
+| Phase | Gate |
+| --- | --- |
+| 0 Discovery | core risks measurable, each with an owner; launch scope approved |
+| 1 Foundation | reproducible client **and** dedicated-server build; automated tests; stable launcher |
+| 2 FPS Core | a complete campaign gameplay sequence runs without a designer or engineering workaround |
+| 3 Campaign Vertical Slice | the slice represents final campaign quality and scales through the production pipeline |
+| 4 **Multiplayer Decision Gate** | Production commits to Path A or Path B above |
+| 5 Campaign Content Production | the content pipeline delivers at target volume, quality and budget |
+| 6 Multiplayer Scale **or** Scope Lock | the released multiplayer scope holds within the tick budget under worst-case load; or MP content is frozen |
+| 7 Polish | no new large features |
+| 8 Release Candidate | engine, core gameplay, save format, asset schema, campaign structure and (if shipping) network protocol are frozen |
+| 9 Launch | launch control staffed; monitoring live |
+| 10 Post-Launch | stability → performance → critical fixes → UX → network → balance → content → live ops |
+
+The dedicated server is **Must-have infrastructure from Phase 1**, even when
+public multiplayer ships later.
 
 ## Explicitly excluded from MVP
 

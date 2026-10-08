@@ -33,6 +33,7 @@ is where that decision lives; where a decision is still open, it is marked
 | [08](08-quality-gates.md) | CI, regression testing and release gates | QA, Production |
 | [09](09-roadmap.md) | Engineering sequence, first 12–16 weeks | Production |
 | [10](10-risks.md) | Risk register | Production, Management |
+| [11](11-scope.md) | Launch scope: Must-have / Should-have / Post-Launch, and the rules that enforce it | Production, all |
 | [90](90-source-reconciliation.md) | Source reconciliation: the six contradictions between the source documents, and how each was resolved | Engineering, Production |
 
 ## Scope boundary: the combat layer

@@ -9,6 +9,12 @@ project brief:
 | **S2** | MVP section 6A, "Prioritisiertes MVP-Backlog" |
 | **S3** | Master Technical Design & Production Specification, Revision 4.0 "Architecture Baseline" |
 
+Four earlier revisions were supplied afterwards and identified as superseded:
+AAA FPS TDD v1.0, Production Bible v3.0, Production Bible v3.2, and a
+standalone Executive Summary. They do not override S1–S3, but three of them
+decided things S1–S3 left open, and one corrected an error of mine. Those
+contributions are recorded in **C7–C10** below.
+
 They overlap heavily and **contradict each other in six places**. A
 specification that contradicts itself cannot be implemented against, so each
 conflict is resolved here, once, with the reason. Where this document and a
@@ -123,6 +129,92 @@ S3 §54 requires a tick target, warning and hard limit derived from profiling,
 and S3 §50 states budgets are fixed against reference hardware. Recorded as
 **OPEN** in [07 — Budgets](07-budgets.md). Owner: Engineering. Target: the
 Performance Baseline milestone (M5).
+
+## C7 — Launch scope needed a classification, not a list
+
+Production Bible v3.2 §1.1 organises every feature as **Must-have /
+Should-have / Post-Launch**, with two governance rules S1–S3 lack: a
+Should-have may not endanger a Must-have, and a Should-have becomes
+Post-Launch *automatically* after endangering two consecutive milestones.
+v3.2 §23.2 adds that a Post-Launch feature may not survive as a hidden
+dependency inside a Must-have system.
+
+**Adopted** as [11 — Launch Scope](11-scope.md). This refines C1 rather than
+contradicting it: v3.2 names **16–32 players as the credible launch target**
+with 50 a stretch test, which is more specific than the ladder C1 recorded.
+
+## C8 — PhysX is not deterministic, and reconciliation must not assume it is
+
+Production Bible v3.0 §9 states that O3DE documents PhysX 4.1 as the default
+with PhysX 5 as an optional configuration, and that O3DE's PhysX simulation is
+not generally deterministic. Its conclusion: server authority plus prediction
+and reconciliation, **not** deterministic PhysX rollback.
+
+**Adopted, and it corrected an error.** An earlier revision of
+[04 — Multiplayer](04-multiplayer.md) required that "simulation must be
+deterministic", which read as a guarantee the physics engine does not offer.
+The requirement is now scoped to Phoenix's own movement rules, with an
+explicit statement of what reconciliation may not assume, and
+physics-driven objects are server-authoritative rather than predicted.
+
+The same paragraph independently corroborates the gem finding in
+[ADR-0010](../adr/0010-engine-dependency-verification.md): the gem named
+`PhysX` is PhysX 4, and PhysX 5 is separate.
+
+## C9 — The frame target was decided all along
+
+v3.2 states **stable 60 FPS on the defined reference hardware** as a
+Must-have, with 120 FPS a should-have on strong hardware, and that frame-time
+*stability* outranks average frame rate.
+
+**Adopted.** [07 — Budgets](07-budgets.md) previously carried every value as
+OPEN, including the frame total. The total is now set (16.67 ms) and
+`budgets.json` carries it. Its distribution across areas, the warning and
+critical thresholds, and the reference hardware specification itself remain
+OPEN — a 60 FPS figure means nothing until the hardware it applies to is
+named.
+
+## C10 — There is no single tick rate
+
+v3.0 §21 and v3.2 separate six rates — input, simulation, replication,
+snapshot, render, interpolation — and explicitly reject the claim that a
+higher uniform rate is always better.
+
+**Adopted** into [07 — Budgets](07-budgets.md). C6 remains correct that the
+rate is a measured outcome; v3.0 adds that it is six measurements, not one.
+
+## Contributions adopted without conflict
+
+Also taken from the superseded revisions, because each is more concrete than
+what S1–S3 carried:
+
+- **Severity classes S0–S4** for release decisions, in
+  [11 — Launch Scope](11-scope.md). S0 blocks deployment, S1 blocks release,
+  S2 needs a three-way decision.
+- **Forbidden cross-cutting dependencies** (rendering → gameplay rules,
+  audio → network authority, UI → PhysX internals, asset pipeline → runtime
+  gameplay, client presentation → server persistence, gameplay data → engine
+  internals), in [02 — Architecture](02-architecture.md).
+- **Interest-management priority levels 0–4**, in
+  [04 — Multiplayer](04-multiplayer.md), replacing a generic "priority"
+  mechanism.
+- **The multiplayer decision gate** with its two explicit paths and their
+  prerequisites, in [09 — Roadmap](09-roadmap.md).
+- **The production phase model** with per-phase gates, in the same chapter.
+
+### Not adopted: the larger gem sets
+
+v1.0 §5.2 lists fourteen gems (adding `PhoenixCombat`, `PhoenixPhysics`,
+`PhoenixRendering`, `PhoenixAudio`, `PhoenixUI`, `PhoenixTelemetry`,
+`PhoenixAnimation`); v3.0 and v3.2 list eleven to twelve. The eight-gem set
+stands, per **C2**: S3 §8.3 argues against gem proliferation, and these
+revisions are superseded. Combat lives in `PhoenixGameplay`, rendering and
+audio integration in `PhoenixPresentation`, physics rules in
+`PhoenixCharacter` and `PhoenixWorld` over the engine's PhysX gem.
+
+This is recorded rather than silently dropped, because the split is a
+reasonable future decision — it is a *cost* decision, not a correctness one,
+and the tier table in [02](02-architecture.md) would accommodate it.
 
 ## Non-conflicts worth recording
 

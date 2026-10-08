@@ -117,6 +117,10 @@ the authority model was built in from the start ([04](04-multiplayer.md)).
 
 ## Release blockers
 
+Severity classes S0–S4 are defined in [11 — Launch Scope](11-scope.md): S0
+blocks release *and* deployment, S1 blocks release, S2 needs a documented
+three-way decision, S3 and S4 ship.
+
 Release is blocked by: crash; save corruption; broken progression;
 unrecoverable soft lock; critical security issue; unbounded memory growth;
 critical streaming failure; unstable build; critical accessibility failure;
