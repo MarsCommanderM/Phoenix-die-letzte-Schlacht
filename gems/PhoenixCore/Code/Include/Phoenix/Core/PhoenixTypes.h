@@ -1,6 +1,8 @@
 #pragma once
-#include <AzCore/base.h>
+
+#include <AzCore/Component/EntityId.h>
 #include <AzCore/Math/Vector3.h>
+#include <AzCore/base.h>
 
 namespace Phoenix
 {
@@ -11,4 +13,4 @@ namespace Phoenix
     {
         AZ::Vector3 value = AZ::Vector3::CreateZero();
     };
-}
+} // namespace Phoenix

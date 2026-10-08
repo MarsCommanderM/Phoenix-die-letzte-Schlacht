@@ -1,17 +1,9 @@
-cmake_minimum_required(VERSION 3.22    Code/Include/Phoenix/Core/PhoenixBuildInfo.h
-    Code/Include/Phoenix/Core/PhoenixDiagnostics.h
-    Code/Include/Phoenix/Core/PhoenixIds.h
-    Code/Include/Phoenix/Core/PhoenixResult.h
-    Code/Include/Phoenix/Core/PhoenixTags.h
-    Code/Include/Phoenix/Core/PhoenixTime.h
-    Code/Include/Phoenix/Core/PhoenixTypes.h
-    Code/Include/Phoenix/Core/PhoenixVersion.h
-    Code/Include/Phoenix/PhoenixCore/PhoenixCore.h
-)
+# Phoenix PhoenixCore gem.
+#
+# o3de_gem_setup establishes gem_name, gem_path, gem_restricted_path and
+# gem_parent_relative_path, which the Code/ CMakeLists needs for PAL
+# resolution. Build targets are declared there.
 
-set(PHOENIX_GEM_NAME PhoenixCore)
+o3de_gem_setup("PhoenixCore")
 
-set(FILES
-    Code/Source/PhoenixCoreModule.cpp
-    Code/Source/PhoenixCoreSystemComponent.cpp
-)
+add_subdirectory(Code)

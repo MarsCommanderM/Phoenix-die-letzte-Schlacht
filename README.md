@@ -1,25 +1,77 @@
-# Phoenix — O3DE 26.05.0 Starter Repository
+# Phoenix — die letzte Schlacht
 
-This repository is the implementation baseline for the Phoenix technical design.
+High-fidelity first-person action game on Open 3D Engine 26.05.0.
+
+**Start here: [Technical Design Document v1.0](docs/tdd/README.md).** It is the
+shared technical reference for Engineering, Gameplay, Art, Audio, QA, Online
+and Production.
 
 ## Baseline
-- O3DE: 26.05.0
-- Renderer: Atom / RPI / RHI
-- Physics: PhysX
-- Animation: EMotionFX
-- Multiplayer: O3DE Multiplayer / AzNetworking
-- Build: O3DE CMake / CLI
-- Primary target: Windows
 
-## Important
-The `engine/o3de/` directory is intentionally not included. Register your local O3DE 26.05.0 engine separately.
+| Area | Choice |
+| --- | --- |
+| Engine | O3DE 26.05.0, pinned exactly |
+| Renderer | Atom / RPI / RHI, Vulkan |
+| Physics | PhysX 5 |
+| Animation | EMotionFX |
+| Multiplayer | O3DE Multiplayer / AzNetworking |
+| UI | LyShine |
+| Build | O3DE CMake / O3DE CLI |
+| Targets | Windows client, Linux dedicated server |
 
-`project/Code/enabled_gems.cmake` is O3DE-managed. Use the O3DE CLI to enable/disable Gems.
+The launch anchor is the **single-player campaign**; public multiplayer follows
+a gate. See [ADR-0007](docs/adr/0007-launch-anchor-and-player-scale.md).
 
-## Configure
+Phoenix is not a new engine stack. The engine supplies infrastructure; Phoenix
+supplies only the difference between a generic engine and the game actually
+required. No custom ECS, renderer, physics, animation runtime, network
+protocol, asset pipeline, UI framework or build system.
+
+## Engine setup
+
+`engine/o3de/` is intentionally not committed. Register a local O3DE 26.05.0
+engine; `project/cmake/EngineFinder.cmake` is produced by that registration and
+is machine-local.
+
 1. Register the Phoenix project with O3DE.
-2. Register the external Phoenix Gems if needed.
-3. Enable the required O3DE Gems.
-4. Configure and build using O3DE CLI / Project Manager.
+2. Register the external Phoenix gems if needed.
+3. Enable the required gems with `o3de enable-gem` — never hand-edit
+   `project/Code/enabled_gems.cmake`.
+4. Configure and build via the presets in `CMakePresets.json`, or the O3DE CLI.
 
-The source tree is intentionally conservative: generated AutoComponent C++ and processed asset products are not committed.
+## Static validation — no engine required
+
+```
+python -m pip install -r requirements-dev.txt
+python scripts/validate.py      # schemas, asset data, gem tiers, CMake/manifest agreement
+python scripts/check_cmake.py   # every CMake list parses and every declared path resolves
+python scripts/test.py          # repository contract, structure and documentation tests
+```
+
+All three run on every pull request. `scripts/test.py` fails on an empty
+suite, so the gate cannot pass without executing anything.
+
+## Layout
+
+| Path | Contents |
+| --- | --- |
+| `docs/tdd/` | Technical Design Document v1.0 |
+| `docs/adr/` | Architecture decision records, registered in [docs/adr/README.md](docs/adr/README.md) |
+| `docs/implementation/` | Interface contracts, multiplayer component schemas, verified boundaries |
+| `gems/` | Eight Phoenix domain gems; tiers in [TDD 02](docs/tdd/02-architecture.md) |
+| `project/` | O3DE project: manifest, code, assets, config, registry |
+| `scripts/` | Configure, build, validate, test, package, release helpers |
+| `tests/` | Repository contract, structure and documentation tests |
+| `.github/workflows/` | CI |
+
+## Open items
+
+[`docs/implementation/verified-boundaries.md`](docs/implementation/verified-boundaries.md)
+lists what still needs a registered engine or an owner's decision. Resolving
+them is Week 1 of [TDD 09](docs/tdd/09-roadmap.md).
+
+The licence is settled: **Apache-2.0** (see
+[ADR-0011](docs/adr/0011-project-licence.md)). Note what that means in
+practice — the source is open, and anyone may ship a commercial derivative as
+long as they preserve the notice. The attribution line in `NOTICE` still needs
+a real legal name before distribution.

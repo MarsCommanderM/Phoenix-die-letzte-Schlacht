@@ -1,12 +1,9 @@
-cmake_minimum_required(VERSION 3.22    Code/Include/Phoenix/Character/PhoenixMovementComponent.h
-    Code/Include/Phoenix/Character/PhoenixMovementTypes.h
-    Code/Include/Phoenix/PhoenixCharacter/PhoenixCharacter.h
-)
+# Phoenix PhoenixCharacter gem.
+#
+# o3de_gem_setup establishes gem_name, gem_path, gem_restricted_path and
+# gem_parent_relative_path, which the Code/ CMakeLists needs for PAL
+# resolution. Build targets are declared there.
 
-set(FILES
-    Code/Source/PhoenixCharacterModule.cpp
-    Code/Source/PhoenixCharacterSystemComponent.cpp
-    Code/Source/PhoenixMovementComponent.cpp
-    Code/Include/Phoenix/Character/PhoenixMovementTypes.h
-    Code/Include/Phoenix/Character/PhoenixMovementComponent.h
-)
+o3de_gem_setup("PhoenixCharacter")
+
+add_subdirectory(Code)

@@ -1,11 +1,9 @@
-cmake_minimum_required(VERSION 3.22    Code/Include/Phoenix/Gameplay/PhoenixAction.h
-    Code/Include/Phoenix/Gameplay/PhoenixGameplayState.h
-    Code/Include/Phoenix/PhoenixGameplay/PhoenixGameplay.h
-)
+# Phoenix PhoenixGameplay gem.
+#
+# o3de_gem_setup establishes gem_name, gem_path, gem_restricted_path and
+# gem_parent_relative_path, which the Code/ CMakeLists needs for PAL
+# resolution. Build targets are declared there.
 
-set(PHOENIX_GEM_NAME PhoenixGameplay)
+o3de_gem_setup("PhoenixGameplay")
 
-set(FILES
-    Code/Source/PhoenixGameplayModule.cpp
-    Code/Source/PhoenixGameplaySystemComponent.cpp
-)
+add_subdirectory(Code)

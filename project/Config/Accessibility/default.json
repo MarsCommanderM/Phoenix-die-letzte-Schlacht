@@ -1,0 +1,10 @@
+{
+    "$comment": "Mandatory coverage, designed in from the start rather than added before release. See docs/tdd/09-roadmap.md.",
+    "inputRemapping": true,
+    "subtitles": { "enabled": true, "backgroundOpacity": null, "speakerLabels": true },
+    "textScaling": { "enabled": true, "minScale": 1.0, "maxScale": null },
+    "colorOptions": { "enabled": true, "modes": [] },
+    "motionReduction": true,
+    "cameraEffectReduction": true,
+    "audioControls": { "masterVolume": true, "separateChannels": true }
+}

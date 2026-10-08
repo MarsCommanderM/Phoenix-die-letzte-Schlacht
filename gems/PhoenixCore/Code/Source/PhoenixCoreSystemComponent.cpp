@@ -1,12 +1,27 @@
-#include <AzCore/Component/Component.h>
+#include <Phoenix/Core/PhoenixCoreSystemComponent.h>
+
+#include <AzCore/Serialization/SerializeContext.h>
 
 namespace Phoenix
 {
-    class PhoenixCoreSystemComponent final : public AZ::Component
+    void PhoenixCoreSystemComponent::Reflect(AZ::ReflectContext* context)
     {
-    public:
-        AZ_COMPONENT(PhoenixCoreSystemComponent, "{00000000-0000-0000-0000-b66c04936d4a}");
-        void Activate() override {}
-        void Deactivate() override {}
-    };
-}
+        if (auto* serializeContext = azrtti_cast<AZ::SerializeContext*>(context))
+        {
+            serializeContext->Class<PhoenixCoreSystemComponent, AZ::Component>()->Version(1);
+        }
+    }
+
+    void PhoenixCoreSystemComponent::GetProvidedServices(AZ::ComponentDescriptor::DependencyArrayType& provided)
+    {
+        provided.push_back(AZ_CRC_CE("PhoenixCoreService"));
+    }
+
+    void PhoenixCoreSystemComponent::Activate()
+    {
+    }
+
+    void PhoenixCoreSystemComponent::Deactivate()
+    {
+    }
+} // namespace Phoenix

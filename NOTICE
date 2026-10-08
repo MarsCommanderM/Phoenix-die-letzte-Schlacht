@@ -1,1 +1,44 @@
-Phoenix is a project built on Open 3D Engine (O3DE). See the O3DE repository and license for engine licensing.
+Phoenix
+Copyright 2026 Michael Braunschweig
+
+This product is licensed under the Apache License, Version 2.0.
+See the LICENSE file for the full licence text.
+
+    SPDX-License-Identifier: Apache-2.0
+
+This line is what every copy of this software and every derivative work must
+carry, under section 4(d) of the licence. It names a natural person. If the
+rights are later assigned to a company, this line changes with them -- and the
+copies already distributed keep the old one, which is why it is worth getting
+right before the first release rather than after.
+
+
+Third-party notices
+-------------------
+
+Phoenix is built on Open 3D Engine (O3DE), a Linux Foundation project.
+O3DE is not vendored in this repository: the engine is registered locally and
+`engine/o3de/` is intentionally absent. O3DE is distributed under
+Apache-2.0 OR MIT; see the LICENSE files in the engine checkout.
+
+Engine gems this project declares as dependencies (Atom, PhysX5, EMotionFX,
+Multiplayer, AudioSystem, LyShine, RecastNavigation) are part of O3DE and
+carry its licensing.
+
+The Apache-2.0 text in LICENSE was taken verbatim from the O3DE source tree
+at tag 2605.0 (LICENSE_APACHE2.TXT) rather than retyped, so that the licence
+text is not subject to transcription error.
+
+The upstream file uses CRLF line endings; .gitattributes normalises text to LF,
+so the committed file differs from upstream in line endings only:
+
+    upstream  (CRLF)  sha256 59dd59cfbd4a7f5af07ad841a11a1865b609e4c1edc68b415a241f3dc0de1244
+    committed (LF)    sha256 7382b1cf711e7a7c7af9816e0e07b49b91e7149b7c6d347225f98800fcb1f1c2
+
+Verify the committed file with: sha256sum LICENSE
+
+RecastNavigation, which the O3DE gem of that name fetches, is distributed
+under the Zlib licence. Further third-party components reach this project
+through the engine; see `docs/implementation/verified-boundaries.md` for the
+third-party governance requirements that apply when a dependency is added
+directly to Phoenix.

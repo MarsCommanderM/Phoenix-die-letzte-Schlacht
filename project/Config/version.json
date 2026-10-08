@@ -1,0 +1,7 @@
+{
+    "$comment": "Product version of the Phoenix game build. Governs what is shipped and released; it does not govern wire compatibility or save compatibility. Versioned independently of network_protocol.json and save_schema.json, because the three contracts change at different rates: a product release can ship with an unchanged protocol and an unchanged save schema. See docs/tdd/06-data-schemas.md, 'Independent version lines'. Enforced by tools/validation/validate_versions.py.",
+    "product": "Phoenix",
+    "major": 0,
+    "minor": 1,
+    "patch": 0
+}

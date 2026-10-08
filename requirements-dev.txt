@@ -1,0 +1,11 @@
+# Validation-only dependencies. The runtime project has none; these are used
+# by scripts/validate.py and scripts/test.py in CI and locally.
+#
+# Pinned exactly, not loosely. scripts/generate_manifest.py records these as
+# part of the build identity and refuses to record an unpinned requirement,
+# because a requirement that resolves differently on different days is not an
+# identity. clang-format is pinned for a second reason: different versions
+# format the same file differently, so an unpinned formatter is a gate that
+# disagrees with the developer who ran it locally.
+jsonschema==4.26.0
+clang-format==18.1.8

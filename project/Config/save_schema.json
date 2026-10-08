@@ -1,0 +1,5 @@
+{
+    "$comment": "Save schema version this build writes (current) and the oldest version it still loads by migrating forward (minimumReadable). current must equal CURRENT_SCHEMA_VERSION in tools/migration/migrate_save.py, and every version from minimumReadable upward must have a migration registered there, or the declared readable range is a promise the code cannot keep. Versioned independently of version.json and network_protocol.json, because the three contracts change at different rates: a save schema moves only when persisted state changes shape. See docs/tdd/06-data-schemas.md, 'Independent version lines'. Enforced by tools/validation/validate_versions.py.",
+    "current": 2,
+    "minimumReadable": 1
+}

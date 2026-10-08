@@ -1,0 +1,8 @@
+{
+    "$comment": "Gameplay never reads hardware codes. Devices map to actions here; see docs/tdd/03-runtime-systems.md.",
+    "actions": [
+        "Move", "Look", "Jump", "Crouch", "Sprint",
+        "Interact", "PrimaryAction", "SecondaryAction", "Pause"
+    ],
+    "remappable": true
+}

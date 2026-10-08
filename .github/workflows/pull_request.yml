@@ -1,0 +1,71 @@
+name: Phoenix Pull Request
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  static:
+    name: Static validation
+    # Platform-independent JSON/schema/contract checks; the Windows game
+    # build is gated separately and needs a registered O3DE engine.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install validation dependencies
+        run: python -m pip install --disable-pip-version-check -r requirements-dev.txt
+      - name: Validate schemas, data and gem graph
+        run: python scripts/validate.py
+      - name: Validate architecture rules
+        run: python scripts/check_architecture.py
+      - name: Validate project and gem manifests
+        run: python tools/validation/validate_project.py
+      - name: Validate asset authoring rules
+        run: python tools/validation/validate_assets.py
+      - name: Validate asset naming
+        run: python tools/validation/validate_asset_naming.py
+      - name: Validate tag and collision-layer registries
+        run: python tools/validation/validate_registries.py
+      - name: Validate engine patch register
+        run: python tools/validation/validate_engine_patches.py
+      - name: Validate version contracts
+        run: python tools/validation/validate_versions.py
+      - name: Report budget coverage
+        run: python tools/profiling/analyze_budget.py
+      - name: Run repository tests
+        run: python scripts/test.py
+
+  format:
+    name: C++ format
+    # clang-format comes from requirements-dev.txt so CI runs exactly the
+    # version a developer runs. An unpinned formatter is a gate that
+    # disagrees with the person who already checked their work.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install validation dependencies
+        run: python -m pip install --disable-pip-version-check -r requirements-dev.txt
+      - name: Check every Phoenix source against .clang-format
+        run: |
+          set -euo pipefail
+          files=$(find gems project -name '*.h' -o -name '*.cpp' | sort)
+          test -n "$files"
+          clang-format --version
+          # shellcheck disable=SC2086
+          clang-format --dry-run -Werror $files
+
+  cmake:
+    name: CMake parse
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify every gem file list parses
+        run: python scripts/check_cmake.py

@@ -1,10 +1,9 @@
-cmake_minimum_required(VERSION 3.22    Code/Include/Phoenix/PhoenixPresentation/PhoenixPresentation.h
-    Code/Include/Phoenix/Presentation/PhoenixPresentationEvent.h
-)
+# Phoenix PhoenixPresentation gem.
+#
+# o3de_gem_setup establishes gem_name, gem_path, gem_restricted_path and
+# gem_parent_relative_path, which the Code/ CMakeLists needs for PAL
+# resolution. Build targets are declared there.
 
-set(PHOENIX_GEM_NAME PhoenixPresentation)
+o3de_gem_setup("PhoenixPresentation")
 
-set(FILES
-    Code/Source/PhoenixPresentationModule.cpp
-    Code/Source/PhoenixPresentationSystemComponent.cpp
-)
+add_subdirectory(Code)

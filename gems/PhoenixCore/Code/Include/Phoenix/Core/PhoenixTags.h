@@ -7,4 +7,4 @@ namespace Phoenix
     {
         AZStd::string value;
     };
-}
+} // namespace Phoenix

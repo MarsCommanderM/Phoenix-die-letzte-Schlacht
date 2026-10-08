@@ -6,4 +6,4 @@ namespace Phoenix
         float deltaSeconds = 0.0f;
         float elapsedSeconds = 0.0f;
     };
-}
+} // namespace Phoenix

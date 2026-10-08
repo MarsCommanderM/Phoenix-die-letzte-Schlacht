@@ -1,0 +1,10 @@
+{
+    "schemaVersion": 1,
+    "campaign": {
+        "mission": "mission_intro",
+        "progression": {
+            "chaptersCompleted": 0
+        },
+        "unlocks": []
+    }
+}

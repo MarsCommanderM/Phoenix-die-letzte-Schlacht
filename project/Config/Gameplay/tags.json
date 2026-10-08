@@ -1,0 +1,57 @@
+{
+    "$comment": "Central gameplay tag registry. See docs/tdd/06-data-schemas.md and docs/tdd/90-source-reconciliation.md C15. Governed by project/Config/Schema/tags.schema.json and validated by tools/validation/validate_registries.py. Every namespace a tag uses must be declared below: an undeclared first segment is a validation failure, not a new namespace, so a typo cannot quietly invent 'Charater.Player'.",
+    "version": 1,
+    "namespaces": [
+        {
+            "name": "Ability",
+            "description": "Classifies an action from project/Assets/Data/Actions; used for cooldown grouping and authority checks."
+        },
+        {
+            "name": "Character",
+            "description": "What kind of actor an entity is. Server-owned; presentation may read it, never set it."
+        },
+        {
+            "name": "Damage",
+            "description": "The cause carried on a damage event, per the combat layer in docs/tdd/03-runtime-systems.md."
+        },
+        {
+            "name": "Objective",
+            "description": "Objective kinds referenced by mission and objective data."
+        },
+        {
+            "name": "Surface",
+            "description": "Material class of a world surface. Drives footstep and impact selection in presentation; never gameplay outcome."
+        },
+        {
+            "name": "Team",
+            "description": "Relationship to the local player, resolved server-side."
+        },
+        {
+            "name": "World",
+            "description": "Properties of a streaming cell or volume, per docs/tdd/03-runtime-systems.md."
+        }
+    ],
+    "tags": [
+        { "name": "Ability.Interact", "description": "Short, interruptible interaction with a world object." },
+        { "name": "Ability.Movement", "description": "Alters gait or traversal state; the one action class with approved client prediction." },
+        { "name": "Ability.Support", "description": "Affects another actor's state without a damage event." },
+        { "name": "Character.AI", "description": "Server-simulated non-player character." },
+        { "name": "Character.Player", "description": "Player-controlled character, local or remote." },
+        { "name": "Damage.Environmental", "description": "Caused by the world rather than an actor; has no attributing actor." },
+        { "name": "Damage.Explosive", "description": "Area effect with falloff; the falloff curve is a data asset." },
+        { "name": "Damage.Impact", "description": "Single-point damage resolved against the server's simulation view." },
+        { "name": "Objective.Control", "description": "Hold a volume for a duration." },
+        { "name": "Objective.Extract", "description": "Reach an exit volume with a required state." },
+        { "name": "Objective.Reach", "description": "Enter a target volume once." },
+        { "name": "Surface.Concrete", "description": "Hard mineral surface." },
+        { "name": "Surface.Metal", "description": "Hard metallic surface." },
+        { "name": "Surface.Soft", "description": "Soil, sand, fabric: absorbs impact audio." },
+        { "name": "Surface.Water", "description": "Standing or flowing water volume surface." },
+        { "name": "Surface.Wood", "description": "Hard organic surface." },
+        { "name": "Team.Friendly", "description": "Same team as the observing player." },
+        { "name": "Team.Hostile", "description": "Opposing team." },
+        { "name": "Team.Neutral", "description": "Neither; cannot be damaged by or damage players." },
+        { "name": "World.Exterior", "description": "Open cell; full streaming radius and sky lighting apply." },
+        { "name": "World.Interior", "description": "Enclosed cell; reduced streaming radius and interior reverb." }
+    ]
+}

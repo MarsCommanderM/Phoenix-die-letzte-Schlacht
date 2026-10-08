@@ -8,4 +8,4 @@ namespace Phoenix
         float threat = 0.0f;
         float confidence = 0.0f;
     };
-}
+} // namespace Phoenix

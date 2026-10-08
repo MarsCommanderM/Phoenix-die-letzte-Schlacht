@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!--
+  Replicated objective state. Server-authoritative; clients never assert
+  completion. States match objective.schema.json.
+-->
+<Component
+    Name="PhoenixNetworkObjectiveComponent"
+    Namespace="Phoenix"
+    OverrideComponent="false"
+    OverrideController="true"
+    OverrideInclude=""
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+    <NetworkProperty Type="uint8_t" Name="ObjectiveState" Init="0"
+        ReplicateFrom="Authority" ReplicateTo="Client" Container="Object" />
+</Component>

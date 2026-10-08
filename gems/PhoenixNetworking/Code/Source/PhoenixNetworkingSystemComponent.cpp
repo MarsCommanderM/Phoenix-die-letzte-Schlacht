@@ -1,12 +1,27 @@
-#include <AzCore/Component/Component.h>
+#include <Phoenix/Networking/PhoenixNetworkingSystemComponent.h>
+
+#include <AzCore/Serialization/SerializeContext.h>
 
 namespace Phoenix
 {
-    class PhoenixNetworkingSystemComponent final : public AZ::Component
+    void PhoenixNetworkingSystemComponent::Reflect(AZ::ReflectContext* context)
     {
-    public:
-        AZ_COMPONENT(PhoenixNetworkingSystemComponent, "{00000000-0000-0000-0000-f73663da9105}");
-        void Activate() override {}
-        void Deactivate() override {}
-    };
-}
+        if (auto* serializeContext = azrtti_cast<AZ::SerializeContext*>(context))
+        {
+            serializeContext->Class<PhoenixNetworkingSystemComponent, AZ::Component>()->Version(1);
+        }
+    }
+
+    void PhoenixNetworkingSystemComponent::GetProvidedServices(AZ::ComponentDescriptor::DependencyArrayType& provided)
+    {
+        provided.push_back(AZ_CRC_CE("PhoenixNetworkingService"));
+    }
+
+    void PhoenixNetworkingSystemComponent::Activate()
+    {
+    }
+
+    void PhoenixNetworkingSystemComponent::Deactivate()
+    {
+    }
+} // namespace Phoenix

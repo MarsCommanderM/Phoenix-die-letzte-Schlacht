@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!--
+  Replicated world-cell activation.
+
+  The server's gameplay-active set is the union over all players and is a
+  different working set from any single client's; see
+  docs/tdd/03-runtime-systems.md.
+-->
+<Component
+    Name="PhoenixNetworkWorldComponent"
+    Namespace="Phoenix"
+    OverrideComponent="false"
+    OverrideController="true"
+    OverrideInclude=""
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+    <NetworkProperty Type="uint8_t" Name="CellActivation" Init="0"
+        ReplicateFrom="Authority" ReplicateTo="Client" Container="Object" />
+</Component>

@@ -1,0 +1,6 @@
+{
+    "$comment": "Wire protocol this build speaks, and the window of peer protocols it accepts: a peer outside minimumCompatible..maximumCompatible is rejected at handshake rather than tolerated and left to desync. Versioned independently of version.json and save_schema.json, because the three contracts change at different rates: the protocol only moves when the wire format moves. See docs/tdd/06-data-schemas.md, 'Independent version lines'. Enforced by tools/validation/validate_versions.py.",
+    "protocol": 1,
+    "minimumCompatible": 1,
+    "maximumCompatible": 1
+}

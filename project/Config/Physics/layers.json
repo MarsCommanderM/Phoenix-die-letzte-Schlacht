@@ -1,0 +1,65 @@
+{
+    "$comment": "Central physics collision layer matrix. See docs/tdd/90-source-reconciliation.md C15 and docs/adr/0003-physics-ownership.md. Governed by project/Config/Schema/layers.schema.json and validated by tools/validation/validate_registries.py. Index 0 is reserved: AzPhysics::CollisionLayer::Default is index 0, and CollisionLayers::GetLayer(name) returns Default when a name is not found (verified in the engine source at tag 2605.0, Code/Framework/AzFramework/AzFramework/Physics/Collision/CollisionLayers.h). A typo'd layer name therefore does not error at runtime, it silently puts the collider on Default. That is the defect this registry exists to prevent.",
+    "version": 1,
+    "maxLayers": 64,
+    "layers": [
+        {
+            "name": "Default",
+            "index": 0,
+            "reserved": true,
+            "description": "Engine-reserved fallback. Nothing in Phoenix is authored onto this layer; a collider that lands here is a missing or misspelled layer assignment, so it is deliberately given no collision partners and shows up as an object that falls through the world."
+        },
+        {
+            "name": "StaticWorld",
+            "index": 1,
+            "reserved": false,
+            "description": "Non-moving level geometry. Owns the collision the character controller sweeps against."
+        },
+        {
+            "name": "DynamicWorld",
+            "index": 2,
+            "reserved": false,
+            "description": "Physics-driven movable objects. Server-authoritative and never client-predicted, per docs/tdd/04-multiplayer.md: PhysX is not deterministic, so a predicted rigid body would diverge."
+        },
+        {
+            "name": "Character",
+            "index": 3,
+            "reserved": false,
+            "description": "PhysX 5 character controllers for both player and AI characters."
+        },
+        {
+            "name": "Trigger",
+            "index": 4,
+            "reserved": false,
+            "description": "Non-blocking objective and script volumes. Reports overlap only; never pushes a character."
+        },
+        {
+            "name": "HitQuery",
+            "index": 5,
+            "reserved": false,
+            "description": "Query-only layer used by server-side hit resolution. Nothing is authored onto it; it exists so hit queries select a different set from the character controller's movement sweep."
+        },
+        {
+            "name": "AIPerception",
+            "index": 6,
+            "reserved": false,
+            "description": "Query-only layer for line-of-sight and cover checks, so perception does not pay for trigger volumes."
+        },
+        {
+            "name": "Debug",
+            "index": 7,
+            "reserved": false,
+            "description": "Development visualisation bodies. Collides with nothing, and is excluded from release builds by the feature flag in PhoenixFeatureFlags."
+        }
+    ],
+    "collidesWith": {
+        "AIPerception": ["Character", "StaticWorld"],
+        "Character": ["AIPerception", "Character", "DynamicWorld", "HitQuery", "StaticWorld", "Trigger"],
+        "Debug": [],
+        "Default": [],
+        "DynamicWorld": ["Character", "DynamicWorld", "HitQuery", "StaticWorld", "Trigger"],
+        "HitQuery": ["Character", "DynamicWorld", "StaticWorld"],
+        "StaticWorld": ["AIPerception", "Character", "DynamicWorld", "HitQuery"],
+        "Trigger": ["Character", "DynamicWorld"]
+    }
+}

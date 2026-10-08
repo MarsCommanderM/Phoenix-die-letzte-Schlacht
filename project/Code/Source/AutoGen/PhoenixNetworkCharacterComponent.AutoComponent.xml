@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<!--
+  Replicated character state.
+
+  Movement is the one state class where client prediction is approved; see
+  docs/tdd/04-multiplayer.md. Everything here is server-authoritative.
+-->
+<Component
+    Name="PhoenixNetworkCharacterComponent"
+    Namespace="Phoenix"
+    OverrideComponent="false"
+    OverrideController="true"
+    OverrideInclude=""
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+    <NetworkProperty Type="uint8_t" Name="MovementState" Init="0"
+        ReplicateFrom="Authority" ReplicateTo="Client" Container="Object" />
+    <NetworkProperty Type="AZ::Vector3" Name="Velocity" Init="AZ::Vector3::CreateZero()"
+        ReplicateFrom="Authority" ReplicateTo="Client" Container="Object" />
+    <NetworkProperty Type="bool" Name="Grounded" Init="false"
+        ReplicateFrom="Authority" ReplicateTo="Client" Container="Object" />
+</Component>

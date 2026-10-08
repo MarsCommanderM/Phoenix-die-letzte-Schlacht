@@ -25,4 +25,4 @@ namespace Phoenix
             return code == ResultCode::Success;
         }
     };
-}
+} // namespace Phoenix
