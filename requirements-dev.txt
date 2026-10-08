@@ -1,0 +1,3 @@
+# Validation-only dependencies. The runtime project has none; these are used
+# by scripts/validate.py and scripts/test.py in CI and locally.
+jsonschema==4.26.0

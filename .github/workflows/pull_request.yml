@@ -1,0 +1,33 @@
+name: Phoenix Pull Request
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  static:
+    name: Static validation
+    # Platform-independent JSON/schema/contract checks; the Windows game
+    # build is gated separately and needs a registered O3DE engine.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install validation dependencies
+        run: python -m pip install --disable-pip-version-check -r requirements-dev.txt
+      - name: Validate schemas, data and gem graph
+        run: python scripts/validate.py
+      - name: Run repository tests
+        run: python scripts/test.py
+
+  cmake:
+    name: CMake parse
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify every gem file list parses
+        run: python scripts/check_cmake.py

@@ -1,4 +1,11 @@
 * text=auto
+
 *.png binary
+*.jpg binary
+*.tga binary
+*.dds binary
+*.exr binary
 *.fbx binary
 *.wav binary
+*.ogg binary
+*.mp3 binary

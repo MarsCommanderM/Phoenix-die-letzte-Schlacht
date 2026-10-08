@@ -1,3 +1,5 @@
+#include <Phoenix/Core/PhoenixRuntimeService.h>
+
 #include <AzCore/Debug/Trace.h>
 #include <Phoenix/Core/PhoenixBuildInfo.h>
 

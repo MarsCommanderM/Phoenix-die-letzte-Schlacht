@@ -1,20 +1,12 @@
+# Phoenix project target file list.
+#
+# Only project-owned code belongs here. Gem headers and sources are
+# declared by their own gems and reach the project through
+# project.json external_subdirectories, which is what keeps the
+# dependency direction in docs/architecture/README.md intact.
+
 set(FILES
     Source/PhoenixModule.cpp
     Source/PhoenixSystemComponent.cpp
-
-    Source/Core/PhoenixRuntimeService.cpp
-    Source/Core/PhoenixDiagnostics.cpp
-
-    Include/Phoenix/Core/PhoenixTypes.h
-    Include/Phoenix/Core/PhoenixIds.h
-    Include/Phoenix/Core/PhoenixResult.h
-    Include/Phoenix/Core/PhoenixTags.h
-    Include/Phoenix/Core/PhoenixTime.h
-    Include/Phoenix/Core/PhoenixVersion.h
-    Include/Phoenix/Core/PhoenixBuildInfo.h
-    Include/Phoenix/Core/PhoenixDiagnostics.h
-    Include/Phoenix/Gameplay/PhoenixAction.h
-    Include/Phoenix/Gameplay/PhoenixGameplayState.h
-    Include/Phoenix/Character/PhoenixMovementTypes.h
-    Include/Phoenix/Character/PhoenixMovementComponent.h
+    Include/Phoenix/Project/PhoenixSystemComponent.h
 )

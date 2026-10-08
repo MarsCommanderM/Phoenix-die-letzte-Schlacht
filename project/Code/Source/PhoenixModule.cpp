@@ -1,5 +1,7 @@
+#include <Phoenix/Project/PhoenixSystemComponent.h>
+
+#include <AzCore/Memory/SystemAllocator.h>
 #include <AzCore/Module/Module.h>
-#include <AzCore/Module/ModuleManagerBus.h>
 
 namespace Phoenix
 {
@@ -12,7 +14,19 @@ namespace Phoenix
 
         PhoenixModule()
         {
-            m_descriptors = AZ::Module::ComponentDescriptors{};
+            m_descriptors.insert(
+                m_descriptors.end(),
+                {
+                    PhoenixSystemComponent::CreateDescriptor(),
+                });
+        }
+
+        //! Without this the system component is reflected but never created.
+        AZ::ComponentTypeList GetRequiredSystemComponents() const override
+        {
+            return AZ::ComponentTypeList{
+                azrtti_typeid<PhoenixSystemComponent>(),
+            };
         }
     };
 
