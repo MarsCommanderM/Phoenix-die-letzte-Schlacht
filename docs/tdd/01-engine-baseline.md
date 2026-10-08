@@ -73,6 +73,30 @@ priority and the FPS gameplay layer. See [04 — Multiplayer](04-multiplayer.md)
 owns the save *schema* and its migrations. See ADR-0004 and
 [06 — Data Schemas](06-data-schemas.md).
 
+## Engine gem scope
+
+Phoenix enables only the engine gems it actually needs. Each enabled gem adds
+build time, descriptor registration, asset-processing work and QA surface, so
+the enabled set is a scope decision rather than a convenience.
+
+Declared as dependencies (all verified to exist at `2605.0`):
+
+`Atom`, `PhysX5`, `EMotionFX`, `Multiplayer`, `AudioSystem`, `LyShine`,
+`RecastNavigation`, `SaveData`.
+
+**Deliberately not enabled by default.** These are useful and may be enabled
+later against a concrete need, but none is a blanket requirement:
+
+`ScriptCanvas`, `ScriptEvents`, `GradientSignal`, `FastNoise`,
+`MultiplayerCompression`, `PythonAssetBuilder`, `AssetValidation`.
+
+`SceneProcessing` is enabled at the **project** level with `o3de enable-gem`
+rather than declared as a gem dependency: it is asset-processing
+infrastructure, not a runtime dependency of any gameplay gem.
+
+Adding an engine gem needs a stated need, the same as adding a third-party
+dependency.
+
 ## Verification status
 
 The engine dependencies and the gem build structure **have** been verified
@@ -93,7 +117,7 @@ the mismatch.
 | File-list naming | verified; `<gemlower>_{api,private,shared}_files.cmake` matches the engine |
 | Settings registry root | both `Amazon` and `O3DE` are in active engine use; the project's own root is **OPEN** |
 | AutoComponent attributes | **not** verified; needs a registered engine to run the generator |
-| `LICENSE` vs gem manifests | unresolved by design; an owner decision |
+| `LICENSE` vs gem manifests | **resolved**: Apache-2.0, see [ADR-0011](../adr/0011-project-licence.md) |
 
 Remaining open items are tracked in
 `docs/implementation/verified-boundaries.md`. Closing them is Week 1 of

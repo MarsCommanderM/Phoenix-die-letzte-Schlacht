@@ -46,6 +46,7 @@ ly_add_target(
         PUBLIC
             AZ::AzCore
             AZ::AzFramework
+            Gem::SaveData.Static
 )
 
 ly_add_target(

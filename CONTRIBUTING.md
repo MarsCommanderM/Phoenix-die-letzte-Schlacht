@@ -34,6 +34,39 @@ strictly downward fails validation. Adding a gem means updating `TIERS` in
 `scripts/validate.py` and `EXPECTED_GEMS` in
 `tests/Unit/test_repository_contract.py`.
 
+## Before creating a file
+
+A file exists only if at least one of these is true. If none is, do not create
+it — an empty placeholder is worse than an absent file, because it reads as
+coverage.
+
+- it owns behavior
+- it owns data
+- it defines a contract
+- it is required by the build
+- it is required at runtime
+- it validates content
+- it tests behavior
+- it automates production
+- it documents an architectural decision
+
+## Changes that need elevated review
+
+These carry consequences that outlive the pull request, so they need a second
+reviewer and an explicit statement of the migration or rollback path:
+
+| Change | Why |
+| --- | --- |
+| `project/project.json` | project identity and gem registration |
+| any `CMakeLists.txt` or `*_files.cmake` | build graph |
+| `project/Code/enabled_gems.cmake` | O3DE-managed; must change via `o3de enable-gem` |
+| `project/Registry/*.setreg` | runtime configuration |
+| `project/Config/save_schema.json` | save compatibility; needs a migration |
+| `project/Config/network_protocol.json` | client/server compatibility |
+| `project/Assets/Schema/*.schema.json` | authoring data contract |
+| `LICENSE` / `NOTICE` | not retroactive; see [ADR-0011](docs/adr/0011-project-licence.md) |
+| anything under `docs/engine-patches/` | engine fork liability; needs an ADR |
+
 ## Generated files
 
 - `project/Code/enabled_gems.cmake` is O3DE-managed; change it with

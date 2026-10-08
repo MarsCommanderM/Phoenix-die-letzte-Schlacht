@@ -80,6 +80,14 @@ and **not**:
 rewind the physics scene and re-simulate it identically
 ```
 
+The correction **threshold** — how large a divergence must be before the
+client is snapped rather than smoothed — is a measured value, not a chosen
+one. A threshold picked by feel either corrects constantly (visible jitter on
+a healthy connection) or too rarely (the client drifts). It is derived from
+the network test matrix and recorded with the budgets in
+[07](07-budgets.md); correction *count* is itself a telemetry metric, so a
+badly set threshold is visible in the data rather than only in complaints.
+
 Concretely: a correction replaces client state with server state and replays
 the client's unacknowledged *inputs* through Phoenix's own movement rules. It
 does not assume that re-running the PhysX scene from a restored snapshot

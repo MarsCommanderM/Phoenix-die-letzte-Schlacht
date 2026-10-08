@@ -40,8 +40,27 @@ then processed by the existing shader build pipeline.
 
 ## Pass hierarchy
 
-Phoenix post-processing decomposes into discrete passes, each with an owner, a
-GPU budget entry and a quality-tier rule:
+**Read this table as an ordering contract, not as a build list.** It states
+which stages exist and in what order they must run. It does **not** commit
+Phoenix to implementing each one as a custom RPI pass: most are Atom features
+that are configured, not written. Which entries become custom Phoenix passes
+is decided per entry, against the escalation ladder above.
+
+A superseded revision of the brief named eight custom passes
+(`PhoenixDepthPass`, `PhoenixVelocityPass`, `PhoenixTemporalPass`, and
+others). A later revision explicitly withdrew that: a pass is not created
+"just because the name looks good". Every custom pass needs five things
+before it exists:
+
+| Required | Why |
+| --- | --- |
+| Use case | a pass with no consumer is dead GPU time |
+| Measured performance cost | it gets a line in the GPU budget or it is not approved |
+| Alternative analysis | which Atom feature or material was tried first and why it was insufficient |
+| Owner | per the rule that no system reaches production without one |
+| Test | a render regression scene that would catch it breaking |
+
+Each stage below carries an owner, a GPU budget entry and a quality-tier rule:
 
 | # | Pass | Depends on | Disable-able | Notes |
 | --- | --- | --- | --- | --- |

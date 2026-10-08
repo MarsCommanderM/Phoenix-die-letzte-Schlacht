@@ -62,6 +62,29 @@ time:
 The `<gemlower>_{api,private,shared}_files.cmake` naming was already correct
 and matches the engine exactly.
 
+### Engine gem target shapes differ
+
+Engine gems do not all expose the same CMake targets. Checked at `2605.0`:
+
+| Gem | Targets it exposes |
+| --- | --- |
+| `RecastNavigation` | `.API` (INTERFACE), `.Private.Object`, module, `.Clients/.Servers/.Unified` + `.API` aliases |
+| `SaveData` | `.Static`, module, `.Clients` alias — **no `.API` target** |
+
+So a Phoenix gem linking an engine gem must use that gem's actual target name.
+`PhoenixCore` depends on `Gem::SaveData.Static`, not `Gem::SaveData.API`.
+Assuming `.API` for every engine gem would fail at link time, which is why
+each is looked up rather than inferred.
+
+Phoenix's own gems all expose `.API`, so inter-gem dependencies use it
+uniformly; that uniformity does not extend to the engine.
+
+`SaveData` was missing from the manifests entirely until this check, even
+though ADR-0004 builds the save architecture on it. `SceneProcessing` is
+deliberately **not** declared as a gem dependency: it is asset-processing
+infrastructure enabled at the project level with `o3de enable-gem`, not a
+runtime dependency of any gameplay gem.
+
 ### Settings registry root
 
 Both roots are in active use at `2605.0`, so the previous claim that `Amazon`
@@ -96,8 +119,9 @@ These need a registered engine or an owner's decision.
   whether `CommonFeaturesAtom` / `AtomLyIntegration` are also required. The
   gem exists and is the right aggregate; what a project needs beyond it
   depends on which features are used.
-- **`LICENSE` versus the gem manifests.** Every `gems/*/gem.json` declares
-  `"license": "Apache-2.0"`, while `LICENSE` is still a placeholder asking for
-  the project's approved licence. These disagree. Choosing the project licence
-  is a decision for the project owner, so neither side was changed; resolve it
-  before any distribution.
+- ~~`LICENSE` versus the gem manifests.~~ **Resolved.** The project owner chose
+  Apache-2.0; see [ADR-0011](../adr/0011-project-licence.md). `LICENSE` now
+  holds the verbatim Apache-2.0 text and the manifests already matched. One
+  item remains: the attribution line in `NOTICE` reads "the Phoenix authors",
+  which is not a legal entity and must name a person or company before
+  distribution.

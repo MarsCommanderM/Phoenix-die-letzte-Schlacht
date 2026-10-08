@@ -19,5 +19,7 @@
         "o3de==26.05.0"
     ],
     "engine_api_dependencies": [],
-    "dependencies": []
+    "dependencies": [
+        "SaveData"
+    ]
 }

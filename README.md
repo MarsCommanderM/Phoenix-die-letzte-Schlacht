@@ -67,7 +67,11 @@ suite, so the gate cannot pass without executing anything.
 ## Open items
 
 [`docs/implementation/verified-boundaries.md`](docs/implementation/verified-boundaries.md)
-lists values that could not be verified without a registered engine, and
-decisions deliberately left to their owners — including the licence mismatch
-between `LICENSE` and the gem manifests. Resolving them is Week 1 of
-[TDD 09](docs/tdd/09-roadmap.md).
+lists what still needs a registered engine or an owner's decision. Resolving
+them is Week 1 of [TDD 09](docs/tdd/09-roadmap.md).
+
+The licence is settled: **Apache-2.0** (see
+[ADR-0011](docs/adr/0011-project-licence.md)). Note what that means in
+practice — the source is open, and anyone may ship a commercial derivative as
+long as they preserve the notice. The attribution line in `NOTICE` still needs
+a real legal name before distribution.

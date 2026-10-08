@@ -18,6 +18,7 @@ decisions continue from 0006. See
 | [0008](0008-rendering-extension-policy.md) | Rendering Extension Policy | accepted |
 | [0009](0009-engine-fork-policy.md) | Engine Fork Policy | accepted |
 | [0010](0010-engine-dependency-verification.md) | Engine Dependency Verification | accepted |
+| [0011](0011-project-licence.md) | Project Licence | accepted |
 
 ## Format
 
