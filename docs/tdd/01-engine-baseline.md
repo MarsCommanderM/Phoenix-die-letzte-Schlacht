@@ -7,7 +7,7 @@
 | Engine | O3DE 26.05.0, pinned exactly (`compatible_engines: ["o3de==26.05.0"]`) |
 | Renderer | Atom, via RPI (Render Pipeline Interface) and RHI |
 | Graphics API | Vulkan as the primary target |
-| Physics | PhysX 5 — the default for new O3DE 26.05 projects |
+| Physics | PhysX 5 — the default for new O3DE 26.05 projects. Gem name: **`PhysX5`**, not `PhysX` |
 | Animation | EMotionFX |
 | Shaders | AZSL, compiled to platform shaders by the asset pipeline |
 | Multiplayer | O3DE Multiplayer Framework over AzNetworking |
@@ -73,16 +73,28 @@ priority and the FPS gameplay layer. See [04 — Multiplayer](04-multiplayer.md)
 owns the save *schema* and its migrations. See ADR-0004 and
 [06 — Data Schemas](06-data-schemas.md).
 
-## Verified versus unverified
+## Verification status
 
-This chapter states the baseline as decided. Several inherited values in the
-repository have **not** been checked against a registered engine, because no
-O3DE installation is present in the environment that produced this document.
-They are tracked in `docs/implementation/verified-boundaries.md` and must be
-confirmed before they are relied on:
+The engine dependencies and the gem build structure **have** been verified
+against the engine source at tag `2605.0`. Three dependency names were wrong
+and are corrected; see
+[ADR-0010](../adr/0010-engine-dependency-verification.md) and
+`docs/implementation/verified-boundaries.md`.
 
-- the engine gem names in `gems/*/gem.json` `dependencies`
-- the settings registry root in `project/Registry/phoenix.settings.setreg`
-- the licence mismatch between `LICENSE` and the gem manifests
+The one worth knowing here: the gem registered as `PhysX` is the **PhysX 4**
+gem. This baseline pins PhysX 5, whose gem is `PhysX5`. Declaring `PhysX`
+would have activated PhysX 4 successfully and silently, with nothing to report
+the mismatch.
 
-Confirming these is the first task of Week 1 in [09 — Roadmap](09-roadmap.md).
+| Area | Status |
+| --- | --- |
+| Engine gem names | verified; `PhysX`→`PhysX5`, `Navigation`→`RecastNavigation`, `Prefab` dropped |
+| Gem build structure | verified against `Gems/RecastNavigation`: three targets, `o3de_gem_setup`, five-argument `o3de_pal_dir` |
+| File-list naming | verified; `<gemlower>_{api,private,shared}_files.cmake` matches the engine |
+| Settings registry root | both `Amazon` and `O3DE` are in active engine use; the project's own root is **OPEN** |
+| AutoComponent attributes | **not** verified; needs a registered engine to run the generator |
+| `LICENSE` vs gem manifests | unresolved by design; an owner decision |
+
+Remaining open items are tracked in
+`docs/implementation/verified-boundaries.md`. Closing them is Week 1 of
+[09 — Roadmap](09-roadmap.md).

@@ -163,7 +163,9 @@ def check_gem_graph(errors: list[str]) -> None:
                 )
 
 
-BUILD_DEP = re.compile(r"Gem::(\w+)\.Static")
+#: Inter-gem dependencies are declared against the public .API target.
+#: `Gem::${gem_name}.API` self-references do not match, by design.
+BUILD_DEP = re.compile(r"Gem::(\w+)\.API")
 
 
 def check_cmake_dependencies(errors: list[str]) -> None:

@@ -52,15 +52,36 @@ class RepositoryContractTests(unittest.TestCase):
                 text = (gem / "CMakeLists.txt").read_text(encoding="utf-8")
                 self.assertIn("add_subdirectory(Code)", text)
 
-    def test_every_gem_declares_both_build_targets(self):
-        """A static library plus a loadable module, per docs/tdd/02."""
+    def test_gem_root_calls_o3de_gem_setup(self):
+        """o3de_gem_setup establishes the variables o3de_pal_dir needs."""
+        for gem in gem_dirs():
+            with self.subTest(gem=gem.name):
+                text = (gem / "CMakeLists.txt").read_text(encoding="utf-8")
+                self.assertIn(f'o3de_gem_setup("{gem.name}")', text)
+
+    def test_every_gem_declares_the_three_build_targets(self):
+        """API interface, private object library and module, per docs/tdd/02.
+
+        This shape is taken from the engine's own gems, not invented: an
+        earlier two-target version would not have configured.
+        """
         for gem in gem_dirs():
             with self.subTest(gem=gem.name):
                 text = (gem / "Code" / "CMakeLists.txt").read_text(encoding="utf-8")
-                self.assertIn(f"NAME {gem.name}.Static STATIC", text)
-                self.assertIn(f"NAME {gem.name} ${{PAL_TRAIT", text)
+                self.assertIn("NAME ${gem_name}.API INTERFACE", text)
+                self.assertIn("NAME ${gem_name}.Private.Object STATIC", text)
+                self.assertIn("NAME ${gem_name} ${PAL_TRAIT_MONOLITHIC_DRIVEN_MODULE_TYPE}", text)
+                self.assertIn("O3DE_PRIVATE_TARGET TRUE", text)
                 for role in ("Clients", "Servers", "Unified"):
-                    self.assertIn(f"NAME {gem.name}.{role}", text)
+                    self.assertIn(f"NAME ${{gem_name}}.{role} ", text)
+                    self.assertIn(f"NAME ${{gem_name}}.{role}.API ", text)
+
+    def test_every_gem_resolves_its_platform_dir(self):
+        for gem in gem_dirs():
+            with self.subTest(gem=gem.name):
+                text = (gem / "Code" / "CMakeLists.txt").read_text(encoding="utf-8")
+                self.assertIn("o3de_pal_dir(pal_dir", text)
+                self.assertIn("PAL_${PAL_PLATFORM_NAME_LOWERCASE}.cmake", text)
 
     def test_every_gem_has_the_three_file_lists(self):
         """Manual sources split api/private/shared; see chapter 90 C5."""
@@ -72,15 +93,19 @@ class RepositoryContractTests(unittest.TestCase):
                         (gem / "Code" / f"{lower}_{kind}_files.cmake").is_file()
                     )
 
-    def test_every_gem_has_platform_file_lists(self):
+    def test_every_gem_has_platform_traits_and_file_lists(self):
+        """PAL_<platform>.cmake for traits plus a list per file kind."""
+        lower = str.lower
         for gem in gem_dirs():
             for platform in ("Windows", "Linux"):
+                pal = gem / "Code" / "Platform" / platform
                 with self.subTest(gem=gem.name, platform=platform):
-                    path = (
-                        gem / "Code" / "Platform" / platform
-                        / f"platform_{platform.lower()}_files.cmake"
-                    )
-                    self.assertTrue(path.is_file())
+                    self.assertTrue((pal / f"PAL_{lower(platform)}.cmake").is_file())
+                    for kind in ("api", "private", "shared"):
+                        self.assertTrue(
+                            (pal / f"{lower(gem.name)}_{kind}_files.cmake").is_file(),
+                            f"missing {platform} {kind} list for {gem.name}",
+                        )
 
     def test_project_has_entry_point_and_target_lists(self):
         self.assertTrue((ROOT / "project" / "CMakeLists.txt").is_file())

@@ -22,7 +22,7 @@
     "dependencies": [
         "PhoenixCore",
         "PhoenixGameplay",
-        "PhysX",
+        "PhysX5",
         "EMotionFX"
     ]
 }

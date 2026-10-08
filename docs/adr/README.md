@@ -17,6 +17,7 @@ decisions continue from 0006. See
 | [0007](0007-launch-anchor-and-player-scale.md) | Launch Anchor and Player Scale | accepted |
 | [0008](0008-rendering-extension-policy.md) | Rendering Extension Policy | accepted |
 | [0009](0009-engine-fork-policy.md) | Engine Fork Policy | accepted |
+| [0010](0010-engine-dependency-verification.md) | Engine Dependency Verification | accepted |
 
 ## Format
 

@@ -1,6 +1,9 @@
-cmake_minimum_required(VERSION 3.22)
+# Phoenix PhoenixTools gem.
+#
+# o3de_gem_setup establishes gem_name, gem_path, gem_restricted_path and
+# gem_parent_relative_path, which the Code/ CMakeLists needs for PAL
+# resolution. Build targets are declared there.
 
-# O3DE discovers this gem through project.json external_subdirectories and
-# descends into Code/, where the build targets are declared.
+o3de_gem_setup("PhoenixTools")
 
 add_subdirectory(Code)

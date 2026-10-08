@@ -23,6 +23,6 @@
         "PhoenixCore",
         "PhoenixGameplay",
         "PhoenixCharacter",
-        "Navigation"
+        "RecastNavigation"
     ]
 }

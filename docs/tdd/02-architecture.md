@@ -59,13 +59,24 @@ indistinguishable from a desync in a server-authoritative game.
 
 ## Build target shape
 
-Each gem produces two targets plus launcher aliases:
+Each gem produces three targets plus six aliases. This shape is taken from the
+engine's own gems (`Gems/RecastNavigation` at tag `2605.0`), not invented:
 
 | Target | Kind | Contents |
 | --- | --- | --- |
-| `<Gem>.Static` | static library | the gem's implementation; what other gems and the project link |
-| `<Gem>` | loadable module | the module entry point only, linking `.Static` |
-| `<Gem>.Clients` / `.Servers` / `.Unified` | aliases | launcher-role resolution |
+| `<Gem>.API` | INTERFACE | the public headers dependent gems consume |
+| `<Gem>.Private.Object` | STATIC | the implementation, marked `O3DE_PRIVATE_TARGET TRUE`; private to the gem's own CMakeLists |
+| `<Gem>` | loadable module | the module entry point, linking `.API` publicly and `.Private.Object` privately |
+| `<Gem>.{Clients,Servers,Unified}` | aliases | launcher-role resolution |
+| `<Gem>.{Clients,Servers,Unified}.API` | aliases | the API target per launcher role |
+
+Inter-gem dependencies are declared against `.API`, never against another
+gem's private object library. That is what makes the tier table enforceable: a
+gem can consume its dependency's headers and nothing else.
+
+The gem root calls `o3de_gem_setup("<Gem>")`, which establishes `gem_name`,
+`gem_path`, `gem_restricted_path` and `gem_parent_relative_path`; the Code
+directory needs all four for `o3de_pal_dir` to resolve the platform folder.
 
 File lists are split the way the engine expects:
 
@@ -74,7 +85,8 @@ File lists are split the way the engine expects:
 | `<gem>_api_files.cmake` | public headers under `Code/Include/` |
 | `<gem>_private_files.cmake` | implementation sources, excluding the module entry point |
 | `<gem>_shared_files.cmake` | the module entry point |
-| `Platform/<Platform>/platform_<platform>_files.cmake` | platform-specific sources (PAL) |
+| `Platform/<Platform>/PAL_<platform>.cmake` | platform traits (`PAL_TRAIT_*`) |
+| `Platform/<Platform>/<gem>_<kind>_files.cmake` | platform-specific sources per kind, referenced as `${pal_dir}/<list>` |
 
 A gem's system component is declared in a public header, registered through
 the module's `m_descriptors`, and returned from

@@ -21,7 +21,6 @@
     "engine_api_dependencies": [],
     "dependencies": [
         "PhoenixCore",
-        "PhoenixGameplay",
-        "Prefab"
+        "PhoenixGameplay"
     ]
 }

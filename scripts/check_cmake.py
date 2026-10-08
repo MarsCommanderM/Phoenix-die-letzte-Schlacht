@@ -34,6 +34,24 @@ FILE_ENTRY = re.compile(r"^\s{4}(\S+\.(?:cpp|h|xml))\s*$", re.M)
 O3DE_CONFIG = """
 set(o3de_FOUND TRUE)
 
+# Establishes the variables a gem's Code/CMakeLists.txt expects. The real
+# function also resolves restricted platforms; the check does not need that.
+function(o3de_gem_setup name)
+    set(gem_name "${name}" PARENT_SCOPE)
+    set(gem_version "0.1.0" PARENT_SCOPE)
+    set(gem_path "${PHOENIX_CHECK_DIR}" PARENT_SCOPE)
+    set(gem_restricted_path "" PARENT_SCOPE)
+    set(gem_parent_relative_path "" PARENT_SCOPE)
+endfunction()
+
+# Five-argument form, as the engine defines it.
+function(o3de_pal_dir out_var requested restricted_path gem_path parent_relative)
+    if(NOT EXISTS "${requested}")
+        message(FATAL_ERROR "o3de_pal_dir: no platform directory at ${requested}")
+    endif()
+    set(${out_var} "${requested}" PARENT_SCOPE)
+endfunction()
+
 function(ly_add_target)
     set(mode "")
     foreach(arg IN LISTS ARGN)
@@ -53,14 +71,27 @@ function(ly_add_target)
     endforeach()
 endfunction()
 
+# Verifies the named module source exists, which is the mistake this call
+# would otherwise hide until link time.
+function(ly_add_source_properties)
+    set(expect_sources FALSE)
+    foreach(arg IN LISTS ARGN)
+        if(arg STREQUAL "SOURCES")
+            set(expect_sources TRUE)
+        elseif(arg MATCHES "^(PROPERTY|VALUES)$")
+            set(expect_sources FALSE)
+        elseif(expect_sources)
+            if(NOT EXISTS "${PHOENIX_CHECK_DIR}/${arg}")
+                message(FATAL_ERROR "ly_add_source_properties names a missing source: ${arg}")
+            endif()
+        endif()
+    endforeach()
+endfunction()
+
 function(ly_create_alias)
 endfunction()
 
 function(o3de_initialize)
-endfunction()
-
-function(o3de_pal_dir out_var)
-    set(${out_var} "${PHOENIX_CHECK_DIR}" PARENT_SCOPE)
 endfunction()
 """
 
@@ -74,6 +105,11 @@ set(PAL_TRAIT_MONOLITHIC_DRIVEN_MODULE_TYPE "MODULE")
 set(PAL_TRAIT_BUILD_HOST_TOOLS TRUE)
 
 set(PHOENIX_CHECK_DIR "{check_dir}")
+set(gem_name "{gem_name}")
+set(gem_version "0.1.0")
+set(gem_path "{check_dir}")
+set(gem_restricted_path "")
+set(gem_parent_relative_path "")
 list(APPEND CMAKE_PREFIX_PATH "{stub_dir}")
 
 # The project entry point declares its own project() with C/CXX; the harness
@@ -105,12 +141,12 @@ def list_files() -> list[tuple[Path, Path]]:
         code = gem / "Code"
         targets += [(code, p) for p in sorted(code.glob("*_files.cmake"))]
         targets += [
-            (code, p) for p in sorted(code.glob("Platform/*/platform_*_files.cmake"))
+            (code, p) for p in sorted(code.glob("Platform/*/*_files.cmake"))
         ]
     code = ROOT / "project" / "Code"
     targets += [(code, p) for p in sorted(code.glob("*_files.cmake"))]
     targets += [
-        (code, p) for p in sorted(code.glob("Platform/*/platform_*_files.cmake"))
+        (code, p) for p in sorted(code.glob("Platform/*/*_files.cmake"))
     ]
     return targets
 
@@ -164,6 +200,11 @@ def check_configures(errors: list[str]) -> int:
                 HARNESS.format(
                     target=target.as_posix(),
                     check_dir=target.parent.as_posix(),
+                    gem_name=(
+                        target.parent.parent.name
+                        if target.parent.name == "Code"
+                        else target.parent.name
+                    ),
                     stub_dir=stub_dir.as_posix(),
                     stub_config=(stub_dir / "o3de-config.cmake").as_posix(),
                 ),
