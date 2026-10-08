@@ -35,6 +35,25 @@ differently, so an unpinned formatter makes CI disagree with the check you
 just ran. `.clang-format` is the engine's own file, unmodified; see
 [ADR-0012](docs/adr/0012-cpp-tooling.md) before changing it.
 
+## Working with the engine
+
+None of the checks above need O3DE, and none of them prove the project
+compiles — `scripts/check_cmake.py` configures against *stubs* of the verified
+engine API. On a machine that has O3DE, start with:
+
+```
+python3 scripts/bringup.py --probe-only   # reports the machine, touches nothing
+```
+
+[`docs/implementation/next-session.md`](docs/implementation/next-session.md)
+is the runbook, including the three mistakes that cost a day: building outside
+a hosted studio's persistent path, paying for GPU time to run a compiler, and
+configuring before `o3de enable-gem` — which succeeds and quietly produces a
+project with no Phoenix code in it.
+
+`bringup.py` is not a CI gate and must not become one: without an engine it
+fails by design.
+
 ## Architecture review
 
 Every pull request answers the nine questions in
