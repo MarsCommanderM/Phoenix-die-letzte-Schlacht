@@ -1,10 +1,18 @@
-"""Verify every Phoenix CMake file list parses and references real files.
+"""Verify the Phoenix CMake structure without a registered O3DE engine.
 
-The imported starter shipped eight gem CMakeLists in which the header list
-was emitted as trailing arguments to an unterminated
-cmake_minimum_required(), so `cmake` rejected all of them with "called with
-unknown argument". That class of defect is invisible until someone
-configures the project, so it is checked here.
+Two kinds of file are checked:
+
+*_files.cmake  pure `set(FILES ...)` lists. Every declared path must exist.
+CMakeLists.txt target declarations. These call engine functions
+               (ly_add_target, ly_create_alias, o3de_initialize) that a bare
+               cmake does not provide, so they are configured against stubs.
+               The ly_add_target stub additionally asserts that every
+               FILES_CMAKE and PLATFORM_INCLUDE_FILES path it is handed
+               exists, which makes this a structural check and not only a
+               syntax check.
+
+What this cannot do is link against O3DE: no engine is present. A green run
+means the build structure is well formed, not that the game compiles.
 """
 from __future__ import annotations
 
@@ -21,18 +29,104 @@ from _repo import ROOT, gem_dirs
 
 FILE_ENTRY = re.compile(r"^\s{4}(\S+\.(?:cpp|h|xml))\s*$", re.M)
 
+# A fake o3de package config, so `find_package(o3de REQUIRED)` resolves and the
+# engine API is available as no-ops that still validate their arguments.
+O3DE_CONFIG = """
+set(o3de_FOUND TRUE)
+
+function(ly_add_target)
+    set(mode "")
+    foreach(arg IN LISTS ARGN)
+        if(arg STREQUAL "FILES_CMAKE" OR arg STREQUAL "PLATFORM_INCLUDE_FILES")
+            set(mode "${arg}")
+        elseif(arg MATCHES "^(NAME|NAMESPACE|INCLUDE_DIRECTORIES|BUILD_DEPENDENCIES|RUNTIME_DEPENDENCIES|COMPILE_DEFINITIONS|AUTOGEN_RULES|TARGET_PROPERTIES)$")
+            set(mode "")
+        elseif(mode)
+            set(candidate "${arg}")
+            if(NOT IS_ABSOLUTE "${candidate}")
+                set(candidate "${PHOENIX_CHECK_DIR}/${arg}")
+            endif()
+            if(NOT EXISTS "${candidate}")
+                message(FATAL_ERROR "${mode} references a missing file: ${arg}")
+            endif()
+        endif()
+    endforeach()
+endfunction()
+
+function(ly_create_alias)
+endfunction()
+
+function(o3de_initialize)
+endfunction()
+
+function(o3de_pal_dir out_var)
+    set(${out_var} "${PHOENIX_CHECK_DIR}" PARENT_SCOPE)
+endfunction()
+"""
+
+HARNESS = """cmake_minimum_required(VERSION 3.22)
+project(PhoenixCMakeStructureCheck LANGUAGES NONE)
+
+# Values the engine would normally supply.
+set(PAL_PLATFORM_NAME "Linux")
+set(PAL_PLATFORM_NAME_LOWERCASE "linux")
+set(PAL_TRAIT_MONOLITHIC_DRIVEN_MODULE_TYPE "MODULE")
+set(PAL_TRAIT_BUILD_HOST_TOOLS TRUE)
+
+set(PHOENIX_CHECK_DIR "{check_dir}")
+list(APPEND CMAKE_PREFIX_PATH "{stub_dir}")
+
+# The project entry point declares its own project() with C/CXX; the harness
+# already established one, and re-declaring languages here would demand
+# compilers this check does not need.
+macro(project)
+endmacro()
+
+macro(add_subdirectory dir)
+    if(NOT EXISTS "${{PHOENIX_CHECK_DIR}}/${{dir}}/CMakeLists.txt")
+        message(FATAL_ERROR "add_subdirectory(${{dir}}) has no CMakeLists.txt")
+    endif()
+endmacro()
+
+# Only the project entry point calls find_package(o3de); the gem and project
+# Code/CMakeLists.txt files expect the engine API to be present already,
+# because the engine established it further up its own build. Load the stubs
+# directly so every file is checked under the same conditions.
+include("{stub_config}")
+
+include("{target}")
+"""
+
 
 def list_files() -> list[tuple[Path, Path]]:
-    """(base directory, cmake list file) pairs covering the whole repository."""
-    targets = [(gem, gem / "CMakeLists.txt") for gem in gem_dirs()]
+    """(base directory for declared paths, *_files.cmake) pairs."""
+    targets: list[tuple[Path, Path]] = []
+    for gem in gem_dirs():
+        code = gem / "Code"
+        targets += [(code, p) for p in sorted(code.glob("*_files.cmake"))]
+        targets += [
+            (code, p) for p in sorted(code.glob("Platform/*/platform_*_files.cmake"))
+        ]
     code = ROOT / "project" / "Code"
-    targets.append((code, code / "Phoenix_files.cmake"))
-    targets.append((code, code / "Phoenix_autogen_files.cmake"))
-    targets.append((code, code / "CMakeLists.txt"))
+    targets += [(code, p) for p in sorted(code.glob("*_files.cmake"))]
+    targets += [
+        (code, p) for p in sorted(code.glob("Platform/*/platform_*_files.cmake"))
+    ]
     return targets
 
 
-def check_paths(errors: list[str]) -> int:
+def cmake_lists() -> list[Path]:
+    """CMakeLists.txt files that declare targets or entry points."""
+    out = []
+    for gem in gem_dirs():
+        out.append(gem / "CMakeLists.txt")
+        out.append(gem / "Code" / "CMakeLists.txt")
+    out.append(ROOT / "project" / "CMakeLists.txt")
+    out.append(ROOT / "project" / "Code" / "CMakeLists.txt")
+    return out
+
+
+def check_declared_paths(errors: list[str]) -> int:
     checked = 0
     for base, cmake_file in list_files():
         if not cmake_file.is_file():
@@ -47,24 +141,32 @@ def check_paths(errors: list[str]) -> int:
     return checked
 
 
-def check_parses(errors: list[str]) -> int:
-    """Configure each list file in isolation with the real cmake binary."""
+def check_configures(errors: list[str]) -> int:
     cmake = shutil.which("cmake")
     if cmake is None:
-        print("NOTE: cmake not found; parse check skipped (path check still ran).")
+        print("NOTE: cmake not found; configure check skipped (path check still ran).")
         return 0
 
-    parsed = 0
+    configured = 0
     with tempfile.TemporaryDirectory() as tmp:
-        for index, (_, cmake_file) in enumerate(list_files()):
-            if not cmake_file.is_file():
+        stub_dir = Path(tmp) / "o3de-stub"
+        stub_dir.mkdir()
+        (stub_dir / "o3de-config.cmake").write_text(O3DE_CONFIG, encoding="utf-8")
+
+        for index, target in enumerate(cmake_lists()):
+            if not target.is_file():
+                errors.append(f"{target.relative_to(ROOT)}: missing")
                 continue
+
             work = Path(tmp) / f"case{index}"
             work.mkdir()
             (work / "CMakeLists.txt").write_text(
-                "cmake_minimum_required(VERSION 3.22)\n"
-                "project(PhoenixCMakeParseCheck LANGUAGES NONE)\n"
-                f'include("{cmake_file.as_posix()}")\n',
+                HARNESS.format(
+                    target=target.as_posix(),
+                    check_dir=target.parent.as_posix(),
+                    stub_dir=stub_dir.as_posix(),
+                    stub_config=(stub_dir / "o3de-config.cmake").as_posix(),
+                ),
                 encoding="utf-8",
             )
             result = subprocess.run(
@@ -73,33 +175,34 @@ def check_parses(errors: list[str]) -> int:
                 text=True,
             )
             if result.returncode != 0:
-                # CMake reports the diagnostic itself on stderr and only the
-                # "Configuring incomplete" summary on stdout, so read both and
-                # keep the lines that name the cause.
                 lines = [
                     line.strip()
                     for line in (result.stderr + "\n" + result.stdout).splitlines()
                     if line.strip() and "Configuring incomplete" not in line
                 ]
-                detail = " ".join(lines[:3]) if lines else "configure failed"
-                errors.append(f"{cmake_file.relative_to(ROOT)}: {detail}")
+                errors.append(
+                    f"{target.relative_to(ROOT)}: {' '.join(lines[:3]) or 'configure failed'}"
+                )
             else:
-                parsed += 1
-    return parsed
+                configured += 1
+    return configured
 
 
 def main() -> None:
     errors: list[str] = []
-    checked = check_paths(errors)
-    parsed = check_parses(errors)
+    paths = check_declared_paths(errors)
+    configured = check_configures(errors)
 
     if errors:
-        print(f"CMake check FAILED ({len(errors)} problems):", file=sys.stderr)
+        print(f"CMake structure check FAILED ({len(errors)} problems):", file=sys.stderr)
         for error in errors:
             print(f"  - {error}", file=sys.stderr)
         raise SystemExit(1)
 
-    print(f"CMake check passed ({parsed} list files parsed, {checked} declared paths exist).")
+    print(
+        f"CMake structure check passed ({configured} CMakeLists configured, "
+        f"{paths} declared paths exist)."
+    )
 
 
 if __name__ == "__main__":

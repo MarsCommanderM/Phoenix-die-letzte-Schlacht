@@ -1,8 +1,72 @@
 {
+    "$comment": "Budget STRUCTURE is fixed; VALUES are deliberately null. See docs/tdd/07-budgets.md. A budget invented without a measurement scene is a number nobody can defend in review, and it would make acceptance criterion 3 unfalsifiable. Values are set at milestone M5 against reference hardware, measured rather than estimated.",
+    "referenceHardware": null,
     "client": {
-        "targetFrameTimeMs": 16.67
+        "frame": {
+            "targetMs": null, "warningMs": null, "criticalMs": null,
+            "measurement": null, "owner": "Engineering"
+        },
+        "areas": {
+            "gameplay":  { "targetMs": null, "warningMs": null, "criticalMs": null, "owner": "Gameplay" },
+            "animation": { "targetMs": null, "warningMs": null, "criticalMs": null, "owner": "Presentation" },
+            "physics":   { "targetMs": null, "warningMs": null, "criticalMs": null, "owner": "Engineering" },
+            "ai":        { "targetMs": null, "warningMs": null, "criticalMs": null, "owner": "AI" },
+            "rendering": { "targetMs": null, "warningMs": null, "criticalMs": null, "owner": "Rendering" },
+            "audio":     { "targetMs": null, "warningMs": null, "criticalMs": null, "owner": "Audio" },
+            "streaming": { "targetMs": null, "warningMs": null, "criticalMs": null, "owner": "Engineering" },
+            "ui":        { "targetMs": null, "warningMs": null, "criticalMs": null, "owner": "UI" }
+        }
     },
     "server": {
-        "targetTickTimeMs": 16.67
+        "tick": {
+            "rateHz": null,
+            "targetMs": null, "warningMs": null, "criticalMs": null,
+            "varianceCriticalMs": null,
+            "measurement": null, "owner": "Engineering",
+            "$comment": "Rate is a measured outcome, not an assumption. See docs/tdd/90-source-reconciliation.md C6."
+        },
+        "areas": {
+            "simulation":  { "targetMs": null, "owner": "Gameplay" },
+            "ai":          { "targetMs": null, "owner": "AI" },
+            "physics":     { "targetMs": null, "owner": "Engineering" },
+            "replication": { "targetMs": null, "owner": "Online" },
+            "network":     { "targetMs": null, "owner": "Online" },
+            "persistence": { "targetMs": null, "owner": "Online" }
+        }
+    },
+    "memory": {
+        "textures":   { "targetBytes": null, "warningBytes": null, "hardLimitBytes": null },
+        "meshes":     { "targetBytes": null, "warningBytes": null, "hardLimitBytes": null },
+        "animations": { "targetBytes": null, "warningBytes": null, "hardLimitBytes": null },
+        "audio":      { "targetBytes": null, "warningBytes": null, "hardLimitBytes": null },
+        "shaders":    { "targetBytes": null, "warningBytes": null, "hardLimitBytes": null },
+        "world":      { "targetBytes": null, "warningBytes": null, "hardLimitBytes": null },
+        "gameplay":   { "targetBytes": null, "warningBytes": null, "hardLimitBytes": null },
+        "streaming":  { "targetBytes": null, "warningBytes": null, "hardLimitBytes": null },
+        "physics":    { "targetBytes": null, "warningBytes": null, "hardLimitBytes": null },
+        "network":    { "targetBytes": null, "warningBytes": null, "hardLimitBytes": null }
+    },
+    "gpu": {
+        "geometry":   { "targetMs": null, "owner": "Rendering" },
+        "shadow":     { "targetMs": null, "owner": "Rendering" },
+        "lighting":   { "targetMs": null, "owner": "Rendering" },
+        "material":   { "targetMs": null, "owner": "Rendering" },
+        "vfx":        { "targetMs": null, "owner": "VFX" },
+        "post":       { "targetMs": null, "owner": "Rendering" },
+        "volumetric": { "targetMs": null, "owner": "Rendering" },
+        "ui":         { "targetMs": null, "owner": "UI" }
+    },
+    "network": {
+        "bytesPerSecondPerPlayer": null,
+        "packetsPerSecond": null,
+        "entitiesPerPlayer": null,
+        "propertiesPerEntity": null,
+        "replicationCpuMs": null,
+        "owner": "Online"
+    },
+    "shaders": {
+        "maxVariantCount": null,
+        "owner": "Rendering",
+        "$comment": "Hard ceiling monitored in CI. An unbounded permutation matrix is a release blocker."
     }
 }

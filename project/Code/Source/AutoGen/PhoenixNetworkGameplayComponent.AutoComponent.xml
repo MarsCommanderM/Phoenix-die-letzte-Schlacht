@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!--
+  Replicated gameplay state.
+
+  Health and combat outcome are server-authoritative with prediction
+  explicitly forbidden: a mispredicted outcome has already been shown to the
+  player as a fact. See docs/tdd/04-multiplayer.md.
+-->
+<Component
+    Name="PhoenixNetworkGameplayComponent"
+    Namespace="Phoenix"
+    OverrideComponent="false"
+    OverrideController="true"
+    OverrideInclude=""
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+    <NetworkProperty Type="float" Name="Health" Init="0.0f"
+        ReplicateFrom="Authority" ReplicateTo="Client" Container="Object" />
+    <NetworkProperty Type="uint8_t" Name="GameplayState" Init="0"
+        ReplicateFrom="Authority" ReplicateTo="Client" Container="Object" />
+</Component>

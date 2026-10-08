@@ -1,0 +1,6 @@
+{
+    "$comment": "Every metric needs name, definition, unit, owner, sampling, retention and threshold, or it is not collected. See docs/tdd/07-budgets.md.",
+    "enabled": false,
+    "metrics": [],
+    "requiredMetricFields": ["name", "definition", "unit", "owner", "sampling", "retention", "alertThreshold"]
+}

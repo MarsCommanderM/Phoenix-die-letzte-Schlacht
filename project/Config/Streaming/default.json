@@ -1,0 +1,12 @@
+{
+    "$comment": "Three distinct levels that must not be conflated: asset residency, world activation, gameplay activation. See docs/tdd/03-runtime-systems.md.",
+    "asynchronous": true,
+    "cellBased": true,
+    "levels": ["Unloaded", "AssetLoaded", "WorldActive", "GameplayActive"],
+    "maxConcurrentCellLoads": null,
+    "cellMemoryBudgetBytes": null,
+    "cascadeGuard": {
+        "enabled": true,
+        "$comment": "A cell load that transitively pulls unrelated content is a defect regardless of measured time."
+    }
+}

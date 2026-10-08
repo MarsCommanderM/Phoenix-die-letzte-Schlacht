@@ -14,6 +14,14 @@ python scripts/test.py          # repository contract tests
 
 All three run in CI on every pull request (`.github/workflows/pull_request.yml`).
 
+## Architecture review
+
+Every pull request answers the nine questions in
+[TDD 08](docs/tdd/08-quality-gates.md): which layer changes, which dependency
+is added, is it necessary, does O3DE already provide it, is the new API
+Phoenix-owned, is persistence affected, is networking affected, is performance
+affected, which tests were added.
+
 ## Dependency direction
 
 `docs/architecture/README.md` defines four gem tiers and
@@ -28,5 +36,9 @@ strictly downward fails validation. Adding a gem means updating `TIERS` in
   `o3de enable-gem` / `o3de disable-gem`, not by hand.
 - AutoComponent C++ is generated from `*.AutoComponent.xml` by O3DE
   Multiplayer and is not committed.
-- `gems/*/CMakeLists.txt` and `project/Code/Phoenix_files.cmake` list files
-  that exist on disk; `scripts/check_cmake.py` fails if they drift.
+- Manual sources, generated inputs and gem activation are three separate
+  responsibilities in three separate places: `*_{api,private,shared}_files.cmake`,
+  `Phoenix_autogen_files.cmake`, `enabled_gems.cmake`. Never merge them.
+- Every CMake list declares files that exist on disk; `scripts/check_cmake.py`
+  fails if they drift, and `scripts/validate.py` fails if a gem's CMake
+  `BUILD_DEPENDENCIES` stop matching its `gem.json`.

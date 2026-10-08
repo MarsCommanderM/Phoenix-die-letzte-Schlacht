@@ -1,4 +1,15 @@
 {
+    "$comment": "Public multiplayer is gated; the architecture is built from the start. See docs/tdd/04-multiplayer.md and 90-source-reconciliation.md C1.",
     "mode": "disabled_until_multiplayer_gate",
-    "serverAuthoritative": true
+    "serverAuthoritative": true,
+    "predictionAllowedFor": ["localPlayerMovement"],
+    "predictionForbiddenFor": ["combatOutcome", "health", "score", "inventory", "progression"],
+    "playerLadder": [2, 8, 16, 32],
+    "stretchGate": { "players": 50, "committed": false },
+    "interestManagement": {
+        "cellRelevance": true,
+        "distanceRelevance": true,
+        "visibilityRelevance": true,
+        "perClientReplicationCap": null
+    }
 }

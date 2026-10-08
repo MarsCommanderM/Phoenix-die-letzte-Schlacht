@@ -1,0 +1,88 @@
+# 01 — Engine Baseline and Fork Policy
+
+## Pinned baseline
+
+| Area | Choice |
+| --- | --- |
+| Engine | O3DE 26.05.0, pinned exactly (`compatible_engines: ["o3de==26.05.0"]`) |
+| Renderer | Atom, via RPI (Render Pipeline Interface) and RHI |
+| Graphics API | Vulkan as the primary target |
+| Physics | PhysX 5 — the default for new O3DE 26.05 projects |
+| Animation | EMotionFX |
+| Shaders | AZSL, compiled to platform shaders by the asset pipeline |
+| Multiplayer | O3DE Multiplayer Framework over AzNetworking |
+| Build | O3DE CMake / CLI |
+| Primary platform | Windows (client), Linux (dedicated server) |
+
+The engine itself is not vendored into this repository. `engine/o3de/` is
+intentionally absent; each developer and build agent registers a local
+O3DE 26.05.0 engine. `project/cmake/EngineFinder.cmake` is written by that
+registration and is machine-local, so it is not committed.
+
+## Why these are pinned exactly
+
+An exact engine pin is what makes acceptance criterion 1 (reproducible builds)
+achievable. A range such as `>=26.05` would let two agents produce different
+binaries from one commit, which breaks every downstream performance
+comparison: a frame-time regression could no longer be attributed to a Phoenix
+change rather than an engine change.
+
+## Fork policy
+
+O3DE is forked under control. The rules:
+
+1. A patch to the engine requires an ADR naming the upstream issue, why the
+   change cannot live in a Phoenix gem, and the engineer who owns rebasing it.
+2. Anything achievable through a gem, an RPI pass, a component, or a data
+   asset is **not** an engine patch. This covers almost all Phoenix-specific
+   rendering, gameplay and networking work.
+3. The patch set is reviewed at every engine upgrade. A patch whose upstream
+   issue has been fixed is dropped rather than carried.
+4. The fork never diverges in file formats, asset schemas or serialisation
+   identity without an ADR, because those changes are not reversible once
+   content exists.
+
+Rationale: the cost of a fork is not the initial patch, it is every subsequent
+upgrade multiplied by the patch count. Treating the patch set as a tracked
+liability keeps that cost visible rather than discovering it at upgrade time.
+
+## What the engine already provides
+
+Recorded explicitly, because the original draft planned to rebuild several of
+these. Building beside them would be cost without differentiation.
+
+**Atom / RPI.** Atom is a modular, pass-driven and data-driven renderer. RPI
+exists to let a project add its own render passes and features. Phoenix
+cinematic technology is therefore implemented as RPI passes, not as a parallel
+renderer. See [05 — Rendering](05-rendering.md).
+
+**AZSL and the shader pipeline.** Shader source is authored in AZSL and
+compiled to platform shaders by the asset pipeline, including variant
+handling. Phoenix does not hand-manage platform shader binaries; it manages
+variant *count*, which is a budget. See [07 — Budgets](07-budgets.md).
+
+**PhysX 5.** Collision, rigid bodies, character controllers and scene queries
+come from PhysX 5. Phoenix owns gameplay rules and query abstractions only;
+it does not own the solver. See ADR-0003.
+
+**Multiplayer Framework.** Server authority, entity replication, RPCs, local
+prediction and backwards reconciliation are provided. Phoenix adds relevance,
+priority and the FPS gameplay layer. See [04 — Multiplayer](04-multiplayer.md).
+
+**SaveData.** Engine and platform persistence integration is provided. Phoenix
+owns the save *schema* and its migrations. See ADR-0004 and
+[06 — Data Schemas](06-data-schemas.md).
+
+## Verified versus unverified
+
+This chapter states the baseline as decided. Several inherited values in the
+repository have **not** been checked against a registered engine, because no
+O3DE installation is present in the environment that produced this document.
+They are tracked in `docs/implementation/verified-boundaries.md` and must be
+confirmed before they are relied on:
+
+- the engine gem names in `gems/*/gem.json` `dependencies`
+- the settings registry root in `project/Registry/phoenix.settings.setreg`
+- the licence mismatch between `LICENSE` and the gem manifests
+
+Confirming these is the first task of Week 1 in [09 — Roadmap](09-roadmap.md).

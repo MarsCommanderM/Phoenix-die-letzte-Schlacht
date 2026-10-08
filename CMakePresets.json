@@ -1,0 +1,71 @@
+{
+    "version": 6,
+    "cmakeMinimumRequired": { "major": 3, "minor": 22, "patch": 0 },
+    "configurePresets": [
+        {
+            "name": "base",
+            "hidden": true,
+            "binaryDir": "${sourceDir}/build/${presetName}",
+            "cacheVariables": {
+                "LY_UNITY_BUILD": "ON",
+                "LY_PROJECTS": "${sourceDir}/project"
+            }
+        },
+        {
+            "name": "windows-client",
+            "displayName": "Windows Client",
+            "description": "Client build for the primary target platform.",
+            "inherits": "base",
+            "generator": "Visual Studio 17 2022",
+            "architecture": "x64",
+            "condition": { "type": "equals", "lhs": "${hostSystemName}", "rhs": "Windows" }
+        },
+        {
+            "name": "linux-server",
+            "displayName": "Linux Dedicated Server",
+            "description": "Headless dedicated server; no renderer or UI required.",
+            "inherits": "base",
+            "generator": "Ninja Multi-Config",
+            "cacheVariables": { "LY_MONOLITHIC_GAME": "OFF" },
+            "condition": { "type": "equals", "lhs": "${hostSystemName}", "rhs": "Linux" }
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "client-profile",
+            "displayName": "Client / profile",
+            "description": "Profiling configuration: the one performance numbers are taken from.",
+            "configurePreset": "windows-client",
+            "configuration": "profile",
+            "targets": ["Phoenix.GameLauncher"]
+        },
+        {
+            "name": "client-release",
+            "displayName": "Client / release",
+            "configurePreset": "windows-client",
+            "configuration": "release",
+            "targets": ["Phoenix.GameLauncher"]
+        },
+        {
+            "name": "client-debug",
+            "displayName": "Client / debug",
+            "configurePreset": "windows-client",
+            "configuration": "debug",
+            "targets": ["Phoenix.GameLauncher"]
+        },
+        {
+            "name": "server-profile",
+            "displayName": "Server / profile",
+            "configurePreset": "linux-server",
+            "configuration": "profile",
+            "targets": ["Phoenix.ServerLauncher"]
+        },
+        {
+            "name": "server-release",
+            "displayName": "Server / release",
+            "configurePreset": "linux-server",
+            "configuration": "release",
+            "targets": ["Phoenix.ServerLauncher"]
+        }
+    ]
+}

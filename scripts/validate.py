@@ -9,6 +9,7 @@ CONTRIBUTING.md requires every change to preserve.
 from __future__ import annotations
 
 import json
+import re
 import sys
 
 import sys
@@ -162,6 +163,35 @@ def check_gem_graph(errors: list[str]) -> None:
                 )
 
 
+BUILD_DEP = re.compile(r"Gem::(\w+)\.Static")
+
+
+def check_cmake_dependencies(errors: list[str]) -> None:
+    """Assert each gem's CMake BUILD_DEPENDENCIES agree with its gem.json.
+
+    docs/tdd/02-architecture.md states the build graph and the declared graph
+    cannot drift apart. That is only true if something checks it.
+    """
+    for gem_dir in gem_dirs():
+        cmake_file = gem_dir / "Code" / "CMakeLists.txt"
+        if not cmake_file.is_file():
+            errors.append(f"gems/{gem_dir.name}/Code/CMakeLists.txt: missing")
+            continue
+
+        manifest = load_json(gem_dir / "gem.json")
+        declared = {d for d in manifest.get("dependencies", []) if d in PHOENIX_GEMS}
+        in_cmake = set(BUILD_DEP.findall(cmake_file.read_text(encoding="utf-8")))
+        in_cmake.discard(gem_dir.name)  # the module links its own .Static target
+
+        if declared != in_cmake:
+            only_manifest = sorted(declared - in_cmake)
+            only_cmake = sorted(in_cmake - declared)
+            errors.append(
+                f"gems/{gem_dir.name}: CMake BUILD_DEPENDENCIES disagree with gem.json "
+                f"(only in gem.json: {only_manifest}, only in CMake: {only_cmake})"
+            )
+
+
 def main() -> None:
     errors: list[str] = []
 
@@ -176,6 +206,7 @@ def main() -> None:
     ids = check_data(schemas, errors)
     check_references(ids, errors)
     check_gem_graph(errors)
+    check_cmake_dependencies(errors)
 
     if errors:
         print(f"Phoenix static validation FAILED ({len(errors)} problems):", file=sys.stderr)

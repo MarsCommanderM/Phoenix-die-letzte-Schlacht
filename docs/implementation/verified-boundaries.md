@@ -30,6 +30,13 @@ engine you register before relying on them.
   It nests settings under `Amazon`, which is the legacy Lumberyard root.
   Newer O3DE settings commonly live under `O3DE`. Verify which root the
   pinned engine reads before adding settings that must take effect.
+- **AutoComponent attribute sets.** The `NetworkProperty` attributes
+  (`ReplicateFrom`, `ReplicateTo`, `Container`) in
+  `project/Code/Source/AutoGen/*.AutoComponent.xml` follow the documented
+  AutoComponent model but have not been validated against the engine's
+  AutoComponent schema. First action on a registered engine: run the generator
+  and fix whatever the schema rejects. See
+  `multiplayer-components.md`.
 - **`LICENSE` versus the gem manifests.** Every `gems/*/gem.json` declares
   `"license": "Apache-2.0"`, while `LICENSE` is still a placeholder asking
   for the project's approved license. These disagree. Choosing the project

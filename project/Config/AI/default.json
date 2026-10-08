@@ -1,0 +1,12 @@
+{
+    "$comment": "AI update tiers. Not every agent runs full logic every tick; see docs/tdd/03-runtime-systems.md.",
+    "updateTiers": {
+        "high":      { "updateHz": null, "perceptionHz": null },
+        "medium":    { "updateHz": null, "perceptionHz": null },
+        "low":       { "updateHz": null, "perceptionHz": null },
+        "suspended": { "updateHz": 0, "perceptionHz": 0 }
+    },
+    "pathQueryBudgetPerTick": null,
+    "decisionBudgetPerTick": null,
+    "spawnBudgetPerTick": null
+}
